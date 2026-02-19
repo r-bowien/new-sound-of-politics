@@ -9,14 +9,16 @@ bibliography: references.bib
 ---
 
 # Introduction
-
+Politians need to find different means of getting their issues on the public agenda. In the recent years we could observe how populist opposition greatly utilised social media to distribute populist narratives and was successful with it (higher vote shares in parliamentary elections across Europe and there have been populist governments in Italy, Poland, Hungary, Czechia, ...). moderate and non-populist political actors have struggled to withstand the populist shift. This may be partially due to the less successful use of social media as a communications tool. Parties in the center and in government only recently
 # Research Question
 
-Do politicians adjust their tone to be generate more reach on social media? If so, does this lead to a more pronounced populist or popular tone? –\> what is the success strategy for which parties on social media?
+Do politicians adjust their tone to generate more reach on social media? If so, does this lead to a more pronounced populist or popular tone? –\> what is the success strategy for which parties on social media?
 
 # Literature Review
 
-Literature makes distinction between populist and popular behaviour \[NEED A LOT OF SOURCES HERE\]. There is no consensus about the definition of populist rhetoric, however, three common traits can be identified. An extensive amount of literature relies on these concepts, this paper therefore uses them too.
+Literature makes distinction between populist and popular behaviour \[NEED A LOT OF SOURCES HERE\]. There is no consensus about the definition of populist rhetoric, however, three common traits can be identified. An extensive amount of literature relies on these concepts, this paper therefore uses them too. While definitions of populist rhetoric exclude a charismatic leader, definitions of the general concept of populism include it [SOURCES]. This paper translates a populist movement having a charismatic leader to a trait of populist rhetoric by identifying what kind of rhetoric it needs to establish a charismatic leader. Literature suggests that this kind of rhetoric requires personalization, direct connection and emotional appeal [SOURCES]. 
+
+How to define popular rhetoric? What makes it different to populist rhetoric? (maybe only adhere to the people and charismatic leader while missing the other 2 aspects)
 
 A lot of research on populist rhetoric in the current age focuses on social media content posted by politicians [@stieglitz2013; SOURCES], few look at the core of democratic discourse: the parliament \[SOURCE needed?\].
 
@@ -26,7 +28,14 @@ Literature distinguishes between populist and popular rhetoric, but most empiric
 
 # Theory
 
+Needs to explain why which parties are successful while others struggle. E.g.:
+
 It is easier to employ 2 out of 3 populist tactics when you are in the opposition (anti-establishment, exclusion of outgroups). In Germany, far left or far right parties are not in power.
+Problem: was the green party using populist rhetoric to be successful? no [SOURCE], although they were in opposition, they did not use rhetoric, but rather popular rhetoric (adhere to the people in a more metaphorical pop-cultural way). Hence, opposition/government is not the only driver for choice of rhetoric. What else? Left-Right positioning? 
+populism is typically right wing
+
+populism always offers "the solution", that noone else offers. To be more credible with your solution, its best to be further away from the mainstream, so you can come up with a solution that noone has heard before/that is not commonly talked about in mainstream media [SOURCE].
+
 
 ## Hypotheses
 
@@ -45,7 +54,6 @@ H2a: Parties in opposition are expected to show more populist tone will be, wher
 H2b: Extreme parties in opposition should show the highest level of populist rhetoric
 
 # Methodology
-
 Conduct a sentiment analysis for speeches in the German Bundestag over the last X years.
 
 Correlate with relevance of social media (what measures relevance? user numbers? time spent on / usage frequency of social media? share of people using social media as their main source of information?)
