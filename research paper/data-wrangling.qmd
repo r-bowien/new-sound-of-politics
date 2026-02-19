@@ -1,0 +1,12 @@
+---
+title: Data wrangling - The New Sound of Politics
+authors:
+  - name: Robert Bowien
+    affiliation: University College Dublin
+    roles: writing
+    corresponding: true
+bibliography: references.bib
+---
+
+
+

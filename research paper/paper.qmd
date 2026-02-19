@@ -1,0 +1,65 @@
+---
+title: The New Sound of Politics
+authors:
+  - name: Robert Bowien
+    affiliation: University College Dublin
+    roles: writing
+    corresponding: true
+bibliography: references.bib
+---
+
+# Introduction
+
+# Research Question
+
+Do politicians adjust their tone to be generate more reach on social media? If so, does this lead to a more pronounced populist or popular tone? –\> what is the success strategy for which parties on social media?
+
+# Literature Review
+
+Literature makes distinction between populist and popular behaviour \[NEED A LOT OF SOURCES HERE\]. There is no consensus about the definition of populist rhetoric, however, three common traits can be identified. An extensive amount of literature relies on these concepts, this paper therefore uses them too.
+
+A lot of research on populist rhetoric in the current age focuses on social media content posted by politicians [@stieglitz2013; SOURCES], few look at the core of democratic discourse: the parliament \[SOURCE needed?\].
+
+WHAT IS THE RESEARCH GAP?
+
+Literature distinguishes between populist and popular rhetoric, but most empirical studies only focus on populist, not popular rhetoric.
+
+# Theory
+
+It is easier to employ 2 out of 3 populist tactics when you are in the opposition (anti-establishment, exclusion of outgroups). In Germany, far left or far right parties are not in power.
+
+## Hypotheses
+
+H1: The general tone of speeches in parliament becomes more populist and more popular as social media becomes more relevant.
+
+-   tone of speeches –\> sentiment analysis score (train model on populist vs popular vs non-pop rhetoric); two different scores per party: how populist and how popular rhetoric
+
+-   relevance social media –\> different metrics, merged into a score? (more literature needed)
+
+H2a: Parties in opposition are expected to show more populist tone will be, whereas governing parties are expected to employ more popular rhetoric.
+
+-   Party position –\> party manifesto? Seating order in Bundestag? expert opinion? (more literature needed)
+
+-   change in tone –\> sentiment analysis score
+
+H2b: Extreme parties in opposition should show the highest level of populist rhetoric
+
+# Methodology
+
+Conduct a sentiment analysis for speeches in the German Bundestag over the last X years.
+
+Correlate with relevance of social media (what measures relevance? user numbers? time spent on / usage frequency of social media? share of people using social media as their main source of information?)
+
+Idea for descriptive stat:
+
+Check in how many speeches the word gendern occurs across parties in the Bundestag. --\> Hypothesis: populist parties like the AfD and CSU talk a lot about them, others do not. \<-- They set the agenda and aim to make it look like big issue for the other (left-green) parties. Could also do a relative frequency analysis using slides from week 5 (chi²/Keyness analysis). expectation: populist parties will talk more about populist topics lol
+
+# Results and Discussion
+
+## Limitations
+
+This paper is limited to data on parliamentary speeches and unrelated social media metrics. To consolidate inferences about a change in parliamentary rhetoric due to the increased relevance of social media, more data is needed. Matching social media posts with speeches in a quantitative rather than limited descriptive manner (like in this paper) would provide a clear image of which and when specific rhetoric is employed in parliament.
+
+Furthermore, this work does not address the demand side of populist/popular rhetoric on social media. To understand, first, in which cases populist/popular rhetoric generates reach successfully, and second, in which cases digital success translates into political success, the demand side is a crucial, yet under-researched topic \[SOURCE\].
+
+# Conclusion
