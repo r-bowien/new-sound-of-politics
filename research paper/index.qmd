@@ -20,7 +20,7 @@ Do politicians adjust their tone to generate more reach on social media? If so, 
 
 Defining populism is a near impossible task, scholars have even referred to this struggle as with Cinderella complex (Aschenputtel-Komplex): There is a shoe formed like populism, but there is no fitting foot [@priester_rechter_2012]. Although there is no consensus about the definition of populist rhetoric, three common traits can be identified: An appeal to "the people", attacking the elites, and ostracising outgroups from the ingroup [@mazzoleni_socially_2018]. An extensive amount of literature relies on these or in their meaning similar concepts [@mazzoleni_socially_2018; @yilmaz_populism_2026; @priester_rechter_2012; @roth_right-wing_2023], this paper therefore uses them too and adds two more that enhance the grasp of the concept but have not been used as widely.
 
-First, while definitions of populist rhetoric exclude a charismatic leader, definitions of the general concept of populism include it [@mazzoleni_socially_2018; @ SOURCES]. This paper translates a populist movement having a charismatic leader to a trait of populist rhetoric by identifying what kind of rhetoric it needs to establish a charismatic leader. Literature suggests that this kind of rhetoric requires personalization, direct connection and emotional appeal [@yilmaz_populism_2026; @roth_right-wing_2023].
+First, while definitions of populist rhetoric exclude a charismatic leader, definitions of the general concept of populism include it [@mazzoleni_socially_2018; \@ SOURCES]. This paper translates a populist movement having a charismatic leader to a trait of populist rhetoric by identifying what kind of rhetoric it needs to establish a charismatic leader. Literature suggests that this kind of rhetoric requires personalization, direct connection and emotional appeal [@yilmaz_populism_2026; @roth_right-wing_2023].
 
 Second, literature sometimes mentions another aspect of populism: making use of a "glorified heartland" and an "idealized conception of community" [@taggart_populism_2004; @engesser_populism_2017]. This aspect of populism will be incorporated into the definition of populist rhetoric as "retrospective utopia" [@priester_rechter_2012].
 
@@ -44,21 +44,25 @@ This study aims to adress both. It builds on a theoretical framework for underst
 
 # Theory
 
+parties want to communicate their ideas to voters \[SOURCE\] –\> social media is crucial for communication \[SOURCE\] –\> to be successful on social media, parties need to adhere to the rules that
+
 Needs to explain why which parties are successful while others struggle. E.g.:
 
-It is easier to employ 2 out of 3 populist tactics when you are in the opposition (anti-establishment, exclusion of outgroups). In Germany, far left or far right parties are not in power. Problem: was the green party using populist rhetoric to be successful? no \[SOURCE\], although they were in opposition, they did not use rhetoric, but rather popular rhetoric (adhere to the people in a more metaphorical pop-cultural way). Hence, opposition/government is not the only driver for choice of rhetoric. What else? Left-Right positioning? populism is typically right wing
+It is easier to employ 2 out of 3 populist tactics when you are in the opposition (anti-establishment, exclusion of outgroups). In Germany, far left or far right parties are not in power. Problem: was the green party using populist rhetoric to be successful? no \[SOURCE\], although they were in opposition, they did not use rhetoric, but rather popular rhetoric (adhere to the people in a more metaphorical pop-cultural way). Hence, opposition/government is not the only driver for choice of rhetoric. What else? Left-Right positioning? right wing populism differs from left wing populism and on social media, right wing populists use tactics attacks on media elite and ostracism of others more than others.
 
 populism always offers "the solution", that noone else offers. To be more credible with your solution, its best to be further away from the mainstream, so you can come up with a solution that noone has heard before/that is not commonly talked about in mainstream media \[SOURCE\].
 
 ## Hypotheses
 
-H1: The general tone of speeches in parliament becomes more populist and more popular as social media becomes more relevant.
+H1: The general tone of speeches in parliament becomes more populist and more popular??? as social media becomes more relevant.
 
--   tone of speeches –\> sentiment analysis score (train model on populist vs popular vs non-pop rhetoric); two different scores per party: how populist and how popular rhetoric
+-   tone and complexity of speeches –\> sentiment analysis score (train model on populist vs popular vs non-pop rhetoric); two different scores per party: how populist and how popular rhetoric
+
+-   look at nikita khokhlovs slides for latent semantic scaling
 
 -   relevance social media –\> different metrics, merged into a score? (more literature needed)
 
-H2a: Parties in opposition are expected to show more populist tone will be, whereas governing parties are expected to employ more popular rhetoric.
+H2a: Parties in opposition are expected to show more populist tone, whereas governing parties are expected to make less use of the populism "critizise the ruling elite" tactic rhetoric.
 
 -   Party position –\> party manifesto? Seating order in Bundestag? expert opinion? (more literature needed)
 
@@ -87,3 +91,7 @@ Furthermore, this work does not address the demand side of populist/popular rhet
 # Conclusion
 
 # NOTES
+
+Look for words that may come from social media culture
+
+look for complexity of speech, social media wants easy stuff, not complicated long sentences, attention span is getting shorter, etc.
