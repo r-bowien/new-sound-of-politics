@@ -20,7 +20,7 @@ Do politicians adjust their tone to generate more reach on social media? If so, 
 
 # Literature Review
 
-Defining populism is a near impossible task, scholars have even referred to this struggle as with Cinderella complex (Aschenputtel-Komplex): There is a shoe formed like populism, but there is no fitting foot [@priester_rechter_2012]. Nevertheless, one definition has been widely adopted to act as a common baseline understanding of populism; the "ideational" approach. It defines populism as a “thin-centered ideology that considers society to be ultimately separated into two homogeneous and antagonistic groups, ‘the pure people’ versus the ‘corrupt elite,’ and which argues that politics should be an expression of the volonté générale (general will) of the people” [@mudde_populist_2007, p.23].
+Defining populism is a near impossible task, scholars have even referred to this struggle as Cinderella-complex (Aschenputtel-Komplex): There is a shoe formed like populism, but there is no foot fitting the shoe [@priester_rechter_2012]. Nevertheless, one definition has been widely adopted to act as a common baseline understanding of populism; the "ideational" approach. It defines populism as a “thin-centered ideology that considers society to be ultimately separated into two homogeneous and antagonistic groups, ‘the pure people’ versus the ‘corrupt elite,’ and which argues that politics should be an expression of the volonté générale (general will) of the people” [@mudde_populist_2007, p.23].
 
 This definition is kept broad enough to be applied by many scholars, but lacks concrete concepts that would allow for clear operationalisation. Furthermore, this paper examines how populists talk and how they employ rhetoric tactics to communicate their ideas to the electorate. Hence, a definition of populist rhetoric is necessary. To derive a definition of populist rhetoric from a general definition of populism, some degree of deduction is required.
 
@@ -36,17 +36,32 @@ First, when viewed from a strategist perspective, definitions of populism includ
 
 Second, literature sometimes mentions another aspect of populism: making use of a "glorified heartland" and an "idealized conception of community" [@taggart_populism_2004; @engesser_populism_2017]. This aspect of populism will be incorporated into the definition of populist rhetoric as "retrospective utopia" [@priester_rechter_2012].
 
-Few scholars try to distinguish between types of populist rhetoric. Everything is either populist or not. This lack of concept poses a problem since it makes it difficult to understand multi-faceted rhetoric styles. The literature that examines a somewhat weaker or softer form of populism, finds that populists adjust their rhetoric to ensure the medias interest in their messaging [@mazzoleni_media_2003]. This dynamic fosters a continuing diffusion of what is populist and what is popular behaviour [@mazzoleni_media_2003] NEED MORE SOURCES\].
+Few scholars try to distinguish between types of populist rhetoric. Everything seems to be either populist or not. This lack of conceptual versatility poses a problem since it makes it difficult to understand multi-faceted rhetoric styles. The literature that examines a somewhat weaker or softer form of populism, finds that populists adjust their rhetoric to ensure the medias interest in their messaging [@mazzoleni_media_2003]. This dynamic fosters a continuing diffusion of what is populist and what is popular behaviour [@mazzoleni_media_2003] NEED MORE SOURCES.
 
-If a distinction in literature is made within populist rhetoric, it is rarely commonly conceptualised in detail. Rather, different concepts are used across studies. Some name it "popular rhetoric" [@mazzoleni_media_2003], some "media populism" [@roth_right-wing_2023] or "weak populism" [@mazzoleni_socially_2018]. While their contextualisation differs slightly, they are similar in concept. All imply a popular rhetoric that constitutes a somewhat weaker, incomplete form of populist rhetoric. Some scholars use the term popular rhetoric to describe aspects of populist rhetoric which have become "popular" [@guazina_media_2023]. Scholars examining media populism embedded the term into a theoretical framework that claims the interplay between the media's need for commercialisation and the populist's desire to be seen changed the way populists behave and talk [@blumler_third_1999]. Weak populism has been used to classify behaviour that does not fulfill all criteria that a strict definition of populism requires \[SOURCE\].
+If a distinction in literature is made within populist rhetoric, it is rarely commonly conceptualised in detail. Rather, different concepts are used across studies. Some name it "popular rhetoric" [@mazzoleni_media_2003], some "media populism" [@roth_right-wing_2023] or "weak"/"soft"/"moderate" populism [@mazzoleni_socially_2018; @barbieri_populism_2024]. While their contextualisation differs slightly, they are similar in concept. All imply a popular rhetoric that constitutes a somewhat weaker, incomplete form of populist rhetoric. The term popular rhetoric is used to describe aspects of populist rhetoric which have become "popular" and support the adhesion to the masses [@guazina_media_2023; @mazzoleni_media_2003]. Scholars examining media populism embedded the term into a theoretical framework that claims the interplay between the media's need for commercialisation and the populist's desire to be seen changed the way populists behave and talk [@blumler_third_1999; @roth_right-wing_2023]. Moderate populism has been used to classify behaviour that does not fulfill all criteria that a strict definition of populism requires but still is close enough to be classified as populist [@mazzoleni_media_2003; @barbieri_populism_2024].
 
 The term "digital populism", which comes closest to combining these concepts, has only recently achieved greater adaption in the literature [@bartlett_new_2011; @gerbaudo_digital_2024; @yilmaz_populism_2026]. Digital populism is commonly understood as the fusion of the mannerisms of populism with the set of rules and possibilities that come with social media [@yilmaz_populism_2026]. Populists can use social media to distribute their ideas and messages without any filter. This is fundamentally distinct for digital populism.
 
-Before the rise of social media were restricted to the rules and filters of media outlets and reporters when communicating with the masses. Media was seen as something the politicians needed to become popular. Nowadays, the relationship shifted. Popular politicians are needed by the media to generate engagement and therefore revenue [@mazzoleni_socially_2018]. Instead of the filtering lenses of journalists, now the rules of the algorithm dictates which messages are communicated to the masses.
+Some scholars question the narrative of a rise in populism over the last years and indeed find evidence that the claim of rising populism is complicated. In the Netherlands, the occurance of populist rhetoric seems to follow no clear trend. This might be due to self-dooming nature of the anti-establishment rhetoric. After populist parties achieve electoral success, they have joined the establishment and it becomes harder to credibly criticise it [@bos_populist_2014].
 
-What makes it different to populist rhetoric? (maybe only adhere to the people and charismatic leader while missing the other 2 aspects)
+This is in line with the claim of populism being endemic in Europe. It has not just risen in the last few years, it has already found its way into political rhetoric across all parties [@mazzoleni_socially_2018]. Populist rhetoric is not exclusive to obviously populist figures. It has become a toolbox for a multitude of political figures to choose from. Ofcourse not every politician uses the same rhetoric tools. One goal of this work is to identify how populist rhetoric differs across parties.
 
-A lot of research on populist rhetoric in the current age focuses on social media content posted by politicians [@stieglitz2013; SOURCES], few look at the core of democratic discourse: the parliament \[SOURCE needed?\].
+Before the rise of social media politicians ways of communicating with the electorate were restricted to the rules and filters of media outlets and reporters when communicating with the masses. Media was seen as something the politicians needed to become popular. Nowadays, the relationship shifted. Popular politicians are needed by the media to generate engagement and therefore revenue [@mazzoleni_socially_2018]. Instead of the filtering lenses of journalists, the rules of algorithms now dictates which messages are communicated to the masses.
+
+Since it has become evident that politicians successfully utilise this lacking filter via social media, a lot of research on populist rhetoric focused on and supported this claim [@stieglitz2013; @engesser_populism_2017; @mazzoleni_socially_2018; @mutascu_online_2025; @stavrakakis_research_2024; @bos_populist_2014; @bobba_likeability_2018; @blassnig_populist_2021].
+
+Digital media has introduced a quick and intense change into how we think political information is consumed by the electorate. Consuming political online content can contribute to political participation [@kahne_political_2018].
+
+next steps:
+
+1.  elaborate on what literature has to say about how digital/social media is used by politicians
+2.  establish link between social media and how parliamentary speeches can be used to create social media content
+3.  say that few look at the core of democratic discourse: the parliament.
+4.  why is it important to look at the parliament?
+
+Foregoing review of the literature tried to establish a meaningful definition for populism that can be operationalised into measurable speech patterns. These patterns will be summarised in the methodological section.
+
+It has also mentioned a link between the use of social media by politicians and the rhetoric patterns in parliamentary speeches. Additionaly it has opened a door to examine the differing ways of populist rhetoric in those parliamentary speeches. This will be elaborated on in the following section on theoretical considerations.
 
 WHAT IS THE RESEARCH GAP?
 
@@ -86,7 +101,7 @@ H2b: Extreme parties in opposition should show the highest level of populist rhe
 
 Conduct a sentiment analysis for speeches in the German Bundestag over the last X years.
 
-Correlate with relevance of social media (what measures relevance? user numbers? time spent on / usage frequency of social media? share of people using social media as their main source of information?)
+Correlate with relevance of social media (what measures relevance? user numbers? time spent on / usage frequency of social media? share of people using social media as their main source of information?) --\> which survey data to use?
 
 Idea for descriptive stat:
 
