@@ -14,21 +14,25 @@ Politians need to find different means of getting their issues on the public age
 
 ## Research Question
 
+How has is social media influencing the tone in parliamentary discussions across Europe? And what does it have to do with populism?
+
 Do politicians adjust their tone to generate more reach on social media? If so, does this lead to a more pronounced populist or popular tone? –\> what is the success strategy for which parties on social media?
 
 # Literature Review
 
 Defining populism is a near impossible task, scholars have even referred to this struggle as with Cinderella complex (Aschenputtel-Komplex): There is a shoe formed like populism, but there is no fitting foot [@priester_rechter_2012]. Nevertheless, one definition has been widely adopted to act as a common baseline understanding of populism; the "ideational" approach. It defines populism as a “thin-centered ideology that considers society to be ultimately separated into two homogeneous and antagonistic groups, ‘the pure people’ versus the ‘corrupt elite,’ and which argues that politics should be an expression of the volonté générale (general will) of the people” [@mudde_populist_2007, p.23].
 
-This definition is kept broad enough to be applied by many scholars, but lacks concrete concepts that would allow for clear operationalisation. Furthermore, this paper examines how populists talk and how they employ rhetoric tactics to communicate their ideas to the electorate. Hence, a definition of populist rhetoric is necessary.
+This definition is kept broad enough to be applied by many scholars, but lacks concrete concepts that would allow for clear operationalisation. Furthermore, this paper examines how populists talk and how they employ rhetoric tactics to communicate their ideas to the electorate. Hence, a definition of populist rhetoric is necessary. To derive a definition of populist rhetoric from a general definition of populism, some degree of deduction is required.
 
-To derive a definition of populist rhetoric from a general definition of populism, some degree of deduction is required. First, the ideology part will be dropped entirely. While populist rhetoric can be used to express ideological ideas, rhetoric itself has no connection to the concept of ideology. Second, the degree to which an argument for politics to express the generall will of the people is present in populist rhetoric cannot be measured easily.
+First, the ideology part will be dropped entirely. While populist rhetoric can be used to express ideological ideas, rhetoric itself has no connection to the concept of ideology. Also, while populism is conceptually seen as a sovereign ideology, in reality it is nearly always connected to ideas and concepts of another ideology [@mudde_populism_2017].
+
+Second, the degree to which an argument for politics to express the general will of the people is present in populist rhetoric cannot be measured easily. HIER BEISPIELE MIT SÖDER ISST? –\> appeal to people by appearing "just like the normal people". Making claim that populist express general will of the people also means representing the peoples traits and not only their presumed wants and needs?
 
 This paper therefore aims to use defining concepts that can be translated into measurable variables. Since this work employs means of quantitative text analysis, these variables can adhere closer to the defining concepts than previous studies of populist rhetoric. More elaboration on this can be found in the methods section.
 
 Although there is no consensus about the definition of populist rhetoric, three common traits can be identified: An appeal to "the people", attacking the elites, and ostracising outgroups from the ingroup [@mazzoleni_socially_2018]. This is in line with the ideational definition and an extensive amount of literature relies on these or in their meaning similar concepts [@mazzoleni_socially_2018; @yilmaz_populism_2026; @priester_rechter_2012; @roth_right-wing_2023]. This paper therefore uses the three common traits and adds two more that enhance the grasp of the concept and will be of relevance for operationalisation purposes but have not been used as widely.
 
-First, while definitions of populist rhetoric exclude a charismatic leader, definitions of the general concept of populism include it [@mazzoleni_socially_2018; \@ SOURCES]. This paper translates a populist movement having a charismatic leader to a trait of populist rhetoric by identifying what kind of rhetoric it needs to establish a charismatic leader. Literature suggests that this kind of rhetoric requires personalization, direct connection and emotional appeal [@yilmaz_populism_2026; @roth_right-wing_2023].
+First, when viewed from a strategist perspective, definitions of populism include the requirement of a charismatic leader [@mazzoleni_socially_2018; @mudde_populism_2017]. This paper translates a populist movement having a charismatic leader to a trait of populist rhetoric by identifying what kind of rhetoric it needs to establish a charismatic leader. Literature suggests that this kind of rhetoric requires personalisation, direct connection and emotional appeal [@yilmaz_populism_2026; @roth_right-wing_2023].
 
 Second, literature sometimes mentions another aspect of populism: making use of a "glorified heartland" and an "idealized conception of community" [@taggart_populism_2004; @engesser_populism_2017]. This aspect of populism will be incorporated into the definition of populist rhetoric as "retrospective utopia" [@priester_rechter_2012].
 
