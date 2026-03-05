@@ -50,14 +50,15 @@ Before the rise of social media politicians ways of communicating with the elect
 
 Since it has become evident that politicians successfully utilise this lacking filter via social media, a lot of research on populist rhetoric focused on and supported this claim [@stieglitz2013; @engesser_populism_2017; @mazzoleni_socially_2018; @mutascu_online_2025; @stavrakakis_research_2024; @bos_populist_2014; @bobba_likeability_2018; @blassnig_populist_2021].
 
-Digital media has introduced a quick and intense change into how we think political information is consumed by the electorate. Consuming political online content can contribute to political participation [@kahne_political_2018].
+Digital media has introduced a quick and intense change into how we think political information is consumed by the electorate. Consuming political online content can contribute to political participation [@kahne_political_2018; @boulianne_social_2015]. Political communication on social media seems to benefit right-wing parties more than left-wing parties [@mutascu_online_2025].
 
-next steps:
+Political communication that employs populist rhetoric on social media differs across parties. Left-wing populists prefer attacks on the economic elite while right-wing populists predominantly attack the media elite and ostracise outgroups [@engesser_populism_2017].
 
-1.  elaborate on what literature has to say about how digital/social media is used by politicians
-2.  establish link between social media and how parliamentary speeches can be used to create social media content
-3.  say that few look at the core of democratic discourse: the parliament.
-4.  why is it important to look at the parliament?
+A recent study of party-related posts on social media in Germany showcases that politicians from parties on the political fringes are more engaged and successful in their social media presence. Posts that are in connection to extremer parties are shown much quicker than posts of parties in the political centre [@verwiebe_digitalisiert_2025]. Political entertainment is just one topic displayed on social media feeds along with comedy, lifestyle, technology, gaming, cooking and more. Political information seemlessly reaches broader audiences. This shows the potential of social media as a political tool and also how important it is to employ tactics that play into the preferences of the algorithms.
+
+While most studies mentioned do an important job of showing how social media is used to communicate to the public, no work has been aimed at the core of democratic discourse: the parliament. The parliament is the central institution of every democracy \[SOURCE\]. Its stated purpose is to provide meaningful discussion open to the public to keep the electorate informed and able to hold politicians accountable. Before social media and the internet, parliamentary debates however, have not been as present in peoples everyday life. Who would voluntarily watch debates unfiltered for hours unpaid? Newspapers and TV-news shows have been the filtering lense through which people perceived a curated subset of the words spoken in parliament. Due to social media, most Germans know how the speakers desk of the Bundestag looks like. Snippets of speeches are frequently posted on social media by parties, politicians or other party-affiliated actors. Politicians have an incentive to hold speeches from which short snippets can be extracted. This suggests that speeches have adopted to the new environment.
+
+If the nature of discourse in parliamentary discussions is changing even more towards a purely performative status of permanent campaigning, it becomes debatable if or how it can still fulfill its function of informing citizens about politicians actions.
 
 Foregoing review of the literature tried to establish a meaningful definition for populism that can be operationalised into measurable speech patterns. These patterns will be summarised in the methodological section.
 
@@ -65,19 +66,17 @@ It has also mentioned a link between the use of social media by politicians and 
 
 WHAT IS THE RESEARCH GAP?
 
-Some scholars distinguish between populist and popular rhetoric, but most empirical studies only focus on populist, not popular rhetoric. Furthermore, existing research demonstrates that populist rhetoric is widely distributed by populist actors through social media. Although populist actors often use snippets of their speeches on social media and it is a claim often made by news outlets \[SOURCE\], no research has linked a potential change in parliamentary rhetoric to social media yet.
+Some scholars distinguish between different forms of populist rhetoric, but most empirical studies only focus on a dichotomous interpretation of populist rhetoric. Furthermore, existing research demonstrates that populist rhetoric is widely utilised by political actors through social media. The claim politicians speeches in parliament are used to create short videos for social media is a claim often made by news outlets \[SOURCES\], no research has linked a potential change in parliamentary rhetoric to social media yet.
 
-This study aims to adress both. It builds on a theoretical framework for understanding reasons for and differences in rhetorical change in parliaments while aiming to examine this potential change over time demonstrating the link to social media. \[CHANGE IF RESULTS DO NOT SUPPORT THIS LINK\]
+This study aims to adress both. It builds on a theoretical framework for understanding reasons for and differences in rhetorical change in parliaments while aiming to examine this potential change over time demonstrating the link to social media. \[CHANGE IF RESULTS DO NOT SUPPORT THIS LINK\].
 
 # Theory
 
-parties want to communicate their ideas to voters \[SOURCE\] –\> social media is crucial for communication \[SOURCE\] –\> to be successful on social media, parties need to adhere to the rules that
+For political actors it is of crucial importance to be able to effectively communicate their ideas and messages to the electorate. In a quickly changing environment where social media is omnipresent and supports direct, raw and agitating messages, political actors are incentivised to develop new ways of communication that adhere to the rules of the algorithm in some way. Existing literature suggests that populism offers successful tools to achieve this.
 
-Needs to explain why which parties are successful while others struggle. E.g.:
+It is easier to critizise the ruling elites and exclude outgroups when you are in the opposition. In Germany, the parties known for populist rhetoric are the far left and far right parties which are not in power. We can expect them to use populist rhetoric to a greater extent as they do not have governing power. To therefore conclude that parties of the political centre do not use populist rhetoric would be wrong. Examples of elements of populist rhetoric can be examined across all parties, especially one particular element. Every political leader tries to appeal to the masses, often by pop-cultural ways. From highly professionalised but very approachable looking door-to-door campaigning of Robert Habeck in the latest parliamentary election to professionally unprofessional sausage devouring by Markus Söder, politicians find a way to make the masses feel close to that charismatic political figure.
 
-It is easier to employ 2 out of 3 populist tactics when you are in the opposition (anti-establishment, exclusion of outgroups). In Germany, far left or far right parties are not in power. Problem: was the green party using populist rhetoric to be successful? no \[SOURCE\], although they were in opposition, they did not use rhetoric, but rather popular rhetoric (adhere to the people in a more metaphorical pop-cultural way). Hence, opposition/government is not the only driver for choice of rhetoric. What else? Left-Right positioning? right wing populism differs from left wing populism and on social media, right wing populists use tactics attacks on media elite and ostracism of others more than others.
-
-populism always offers "the solution", that noone else offers. To be more credible with your solution, its best to be further away from the mainstream, so you can come up with a solution that noone has heard before/that is not commonly talked about in mainstream media \[SOURCE\].
+Hence, it seems that populist rhetoric is employed both in and out of government and even though it takes on different forms, no politician can escape it. The advantage of populist rhetoric lies in its ability to always offers the solution that nobody else offers. To be most credible with this unique solution, it is best to present yourself further away from the mainstream, where you can easily come up with something that is not commonly talked about, something that is unique and plays into the rules of algorithms. This should be easiest for opposition and extreme parties, which is why it can be expected that they were the first to adjust their rhetoric. With the ongoing success, moderate parties had to adjust aswell and even though they do not show their populist tools that obvious, they will have learned to utilise them by now.
 
 ## Hypotheses
 
