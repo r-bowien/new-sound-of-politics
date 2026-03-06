@@ -34,6 +34,12 @@ Do politicians adjust their tone in parliamentary speeches to generate more reac
 
 # Literature Review
 
+A common narrative found in European media outlets is that populism and its rhetorical traits have risen during the last years. Some scholars question this narrative and indeed find evidence that the situation is more complicated. In the Netherlands, the occurance of populist rhetoric seems to follow no clear trend. This might be due to self-dooming nature of the anti-establishment rhetoric. After populist parties achieve electoral success, they have joined the establishment and it becomes harder to credibly criticise it [@bos_populist_2014].
+
+This is in line with the claim of populism being endemic in Europe. It has not risen in the last few years, it has long found its way into political rhetoric across all parties [@mazzoleni_socially_2018]. Populist rhetoric is not exclusive to obviously populist figures. It has become a toolbox for a multitude of political figures to choose from. Ofcourse not every politician uses the same rhetoric tools. One goal of this work is to identify how populist rhetoric differs across parties.
+
+TODO: why am I still expecting an increase over time?
+
 Defining populism is a near impossible task. Scholars have even referred to this struggle as Cinderella-complex (Aschenputtel-Komplex): There is a shoe formed like populism, but there is no foot fitting the shoe [@priester_rechter_2012]. Nevertheless, one definition has been widely adopted to act as a common baseline understanding of populism; the "ideational" approach. It defines populism as a “thin-centered ideology that considers society to be ultimately separated into two homogeneous and antagonistic groups, ‘the pure people’ versus the ‘corrupt elite,’ and which argues that politics should be an expression of the volonté générale (general will) of the people” [@mudde_populist_2007, p.23].
 
 ## Modern populist rhetoric
@@ -42,9 +48,9 @@ This definition is kept broad enough to be applied by many scholars, but lacks c
 
 First, the ideology part is dropped entirely. While populist rhetoric can be used to express ideological ideas, rhetoric itself has no connection to the concept of ideology. Also, while populism is conceptually seen as a sovereign ideology, in reality it is nearly always connected to ideas and concepts of another ideology [@mudde_populism_2017].
 
-Second, the degree to which an argument for politics to express the general will of the people is present in populist rhetoric cannot be measured easily. Showing yourself eating Bratwurst on social media as the prime minister of Bavaria clearly has political motives. It is a tool to appeal to the masses by representing traits of the masses. Germans like their Bratwurst. This example shows that politicians can use this populist tool not only through expressing a general popular will, but also by showing that they are just as common as the people.
+Second, the degree to which an argument for politics to express the general will of the people is present in populist rhetoric cannot be measured easily. Showing yourself eating Bratwurst on social media as the prime minister of Bavaria clearly has political motives. It is a tool to appeal to the masses by representing traits of the masses. Germans like their Bratwurst. This example shows that politicians can use this populist tool not only by expressing a general popular will, but also by displaying traits of the common people.
 
-This paper therefore aims to use defining concepts that can be translated into measurable variables. Since this work employs means of quantitative text analysis, these variables can adhere closer to the defining concepts than previous studies of populist rhetoric. More elaboration on this can be found in the methods section.
+Due to this variability it is important to define concepts that can be translated into measurable variables. Since this work employs means of quantitative text analysis, these variables can adhere closer to the defining concepts than previous studies of populist rhetoric. More elaboration on this can be found in the methods section.
 
 Although there is no consensus about the definition of populist rhetoric, three common traits can be identified: An appeal to "the people", attacking the elites, and ostracising outgroups from the ingroup [@mazzoleni_socially_2018]. This is in line with the ideational definition and an extensive amount of literature relies on these or in their meaning similar concepts [@mazzoleni_socially_2018; @yilmaz_populism_2026; @priester_rechter_2012; @roth_right-wing_2023]. This paper therefore uses the three common traits and adds two more that enhance the grasp of the concept and will be of relevance for operationalisation purposes but have not been used as widely.
 
@@ -52,15 +58,13 @@ First, when viewed from a strategist perspective, definitions of populism includ
 
 Second, literature sometimes mentions another aspect of populism: making use of a "glorified heartland" and an "idealized conception of community" [@taggart_populism_2004; @engesser_populism_2017]. This aspect of populism will be incorporated into the definition of populist rhetoric as "retrospective utopia" [@priester_rechter_2012].
 
+TODO: include "thickening" of populism: populism is mostly attached to another ideology like nativism (right wing) or socialism (left wing)
+
 Few scholars try to distinguish between types of populist rhetoric. Everything seems to be either populist or not. This lack of conceptual versatility poses a problem since it makes it difficult to understand multi-faceted rhetoric styles. The literature that examines a somewhat weaker or softer form of populism, finds that populists adjust their rhetoric to ensure the medias interest in their messaging [@mazzoleni_media_2003]. This dynamic fosters a continuing diffusion of what is populist and what is popular behaviour [@mazzoleni_media_2003] NEED MORE SOURCES.
 
 If a distinction in literature is made within populist rhetoric, it is rarely commonly conceptualised in detail. Rather, different concepts are used across studies. Some name it "popular rhetoric" [@mazzoleni_media_2003], some "media populism" [@roth_right-wing_2023] or "weak"/"soft"/"moderate" populism [@mazzoleni_socially_2018; @barbieri_populism_2024]. While their contextualisation differs slightly, they are similar in concept. All imply a popular rhetoric that constitutes a somewhat incomplete form of populist rhetoric. The term popular rhetoric is used to describe aspects of populist rhetoric which have become "popular" and support the appeal to the masses [@guazina_media_2023; @mazzoleni_media_2003]. Scholars examining media populism embedded the term into a theoretical framework that claims the interplay between the media's need for commercialisation and the populist's desire to be seen changed the way populists behave and talk [@blumler_third_1999; @roth_right-wing_2023]. Moderate populism has been used to classify behaviour that does not fulfill all criteria that a strict definition of populism requires but still is close enough to be classified as populist [@mazzoleni_media_2003; @barbieri_populism_2024].
 
-The term "digital populism", which comes closest to combining these concepts, has only recently achieved greater adaption in the literature [@bartlett_new_2011; @gerbaudo_digital_2024; @yilmaz_populism_2026]. Digital populism is commonly understood as the fusion of the mannerisms of populism with the set of rules and possibilities that come with social media [@yilmaz_populism_2026]. Populists can use social media to distribute their ideas and messages without any filter. This is fundamentally distinct for digital populism. The degree of digital populism in politicians rhetoric therefore will be the concept this paper aims to measure.
-
-Some scholars question the narrative of a rise in populism over the last years and indeed find evidence that the claim of rising populism is complicated. In the Netherlands, the occurance of populist rhetoric seems to follow no clear trend. This might be due to self-dooming nature of the anti-establishment rhetoric. After populist parties achieve electoral success, they have joined the establishment and it becomes harder to credibly criticise it [@bos_populist_2014].
-
-This is in line with the claim of populism being endemic in Europe. It has not risen in the last few years, it has long found its way into political rhetoric across all parties [@mazzoleni_socially_2018]. Populist rhetoric is not exclusive to obviously populist figures. It has become a toolbox for a multitude of political figures to choose from. Ofcourse not every politician uses the same rhetoric tools. One goal of this work is to identify how populist rhetoric differs across parties.
+The term "digital populism", which comes closest to combining these concepts, has only recently achieved greater adaption in the literature [@bartlett_new_2011; @gerbaudo_digital_2024; @yilmaz_populism_2026]. Digital populism is commonly understood as the fusion of the mannerisms of populism with the set of rules and possibilities that come with social media [@yilmaz_populism_2026]. Populists can use social media to distribute their ideas and messages without any filter. This is fundamentally distinct for digital populism. The degree of digital populism in politicians rhetoric therefore will be the concept this paper aims to measure and whenever populist rhetoric is mentioned, it is meant to be understood in the context of digital populism.
 
 ## Social media and populism
 
@@ -86,15 +90,17 @@ This study aims to adress both. It builds on a theoretical framework for underst
 
 # Theory
 
-For political actors it is of crucial importance to be able to effectively communicate their ideas and messages to the electorate. In a quickly changing environment where social media is omnipresent and supports direct, raw and agitating messages, political actors are incentivised to develop new ways of communication that adhere to the rules of the algorithm in some way. Existing literature suggests that populism offers successful tools to achieve this.
+For political actors it is of crucial importance to be able to effectively communicate their ideas and messages to the electorate. In a quickly changing environment where social media is omnipresent and supports direct, raw and agitating messages, political actors are incentivised to develop new ways of communication that adhere to the rules of the algorithm in some way. The reviewed literature suggests that populism offers successful tools to achieve this.
 
-It is easier to critizise the ruling elites and exclude outgroups when you are in the opposition. In Germany, the parties known for populist rhetoric are the far left and far right parties which are not in power. We can expect them to use populist rhetoric to a greater extent as they do not have governing power. To therefore conclude that parties of the political centre do not use populist rhetoric would be wrong. Examples of elements of populist rhetoric can be examined across all parties, especially one particular element. Every political leader tries to appeal to the masses, often by pop-cultural ways. From highly professionalised but very approachable looking door-to-door campaigning of Robert Habeck in the latest parliamentary election to professionally unprofessional sausage devouring by Markus Söder, politicians find a way to make the masses feel close to that charismatic political figure.
+It is easier to critizise the ruling elites when you are in the opposition. In Germany, the parties known for populist rhetoric are the far left and far right parties which are not in power. We can expect them to use populist rhetoric to a greater extent as they do not have governing power. To therefore conclude that parties of the political centre do not use populist rhetoric would be wrong. Examples of elements of populist rhetoric can be examined across all parties, especially one particular element. Every political leader tries to appeal to the masses, often by pop-cultural ways. From highly professionalised but very approachable looking door-to-door campaigning of Robert Habeck in the latest parliamentary election to professionally unprofessional sausage devouring by Markus Söder, politicians find a way to make the masses feel close to that charismatic political figure.
 
 Hence, it seems that populist rhetoric is employed both in and out of government and even though it takes on different forms, no politician can escape it. The advantage of populist rhetoric lies in its ability to always offers the solution that nobody else offers. To be most credible with this unique solution, it is best to present yourself further away from the mainstream, where you can easily come up with something that is not commonly talked about, something that is unique and plays into the rules of algorithms. This should be easiest for opposition and extreme parties, which is why it can be expected that they were the first to adjust their rhetoric. With the ongoing success, moderate parties had to adjust aswell and even though they do not show their populist tools that obvious, they will have learned to utilise them by now.
 
 ## Hypotheses
 
-H1: The general tone of speeches in parliament becomes more populist and more popular??? as social media becomes more relevant.
+Based on the theoretical framework, following hypotheses are specified.
+
+H1: More elements of populist rhetoric will be identified in parliamentary speeches as social media becomes more relevant as a medium of political information.
 
 -   tone and complexity of speeches –\> sentiment analysis score (train model on populist vs popular vs non-pop rhetoric); two different scores per party: how populist and how popular rhetoric
 
@@ -102,15 +108,19 @@ H1: The general tone of speeches in parliament becomes more populist and more po
 
 -   relevance social media –\> different metrics, merged into a score? (more literature needed)
 
-H2a: Parties in opposition are expected to show more populist tone, whereas governing parties are expected to make less use of the populism "critizise the ruling elite" tactic rhetoric.
+H2a: Parties in opposition are expected to use more elements of populist rhetoric, whereas governing parties are expected to make less use of the "critizise the ruling elite" tactic.
 
 -   Party position –\> party manifesto? Seating order in Bundestag? expert opinion? (more literature needed)
 
 -   change in tone –\> sentiment analysis score
 
-H2b: Extreme parties in opposition should show the highest level of populist rhetoric
+H2b: Extreme parties in opposition should show the highest level of populist rhetoric.
 
 # Methodology
+
+It is still contested and context-dependent how populist rhetoric should be operationalised [@popping_measuring_2018].
+
+Using a BERT model and fine-tuning it myself is a common approach and recently employed by recent scholars to avoid dichotomous classifying of populism and rather classify aspects of their communications [@erhard_popbert_2025].
 
 Conduct a sentiment analysis for speeches in the German Bundestag over the last X years.
 
