@@ -9,4 +9,32 @@ bibliography: references.bib
 ---
 
 
+```{r}
 
+```
+
+```{r}
+
+gles_data <- haven::read_dta("new-sound-of-politics/data/ZA6832_v2-0-0.dta")
+
+gles_korresp <- readxl::read_xlsx("new-sound-of-politics/data/ZA6832_v2-0-0_Korrespondenzliste.xlsx")
+
+
+```
+
+```{r}
+nrow(gles_data_stata)
+nrow(gles_korresp)
+
+# gles_subset <- gles_korresp[grepl("Pol. Mediennutzun", gles_korresp$Variablenlabel),]
+
+gles_data$m0001_1
+
+
+info_source_data <- gles_data |> subset(select = c("field_start", "field_end", "version", "m0001_2", "m0001_3")) # m0001_1 does not yet include social media, social media in there since 2012
+
+
+
+summary(info_source_data)
+
+```
