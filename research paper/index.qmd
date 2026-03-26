@@ -74,7 +74,7 @@ Since it has become evident that politicians successfully utilise this lacking f
 
 Digital media has introduced a quick and intense change into how we think political information is consumed by the electorate. Consuming political online content can contribute to political participation [@kahne_political_2018; @boulianne_social_2015]. Political communication on social media seems to benefit right-wing parties more than left-wing parties [@mutascu_online_2025]. Political communication that employs populist rhetoric on social media differs across parties. Left-wing populists prefer attacks on the economic elite while right-wing populists predominantly attack the media elite and ostracise outgroups [@engesser_populism_2017].
 
-A recent study of party-related posts on social media in Germany showcases that politicians from parties on the political fringes are more engaged and successful in their social media presence. Posts that are in connection to extremer parties are shown much quicker than posts of parties in the political centre [@verwiebe_digitalisiert_2025]. Political entertainment is just one topic displayed on social media feeds along with comedy, lifestyle, technology, gaming, cooking and more. Political information seamlessly reaches broader audiences. This shows the potential of social media as a political tool and also how important it is to employ tactics that play into the preferences of the algorithms.
+A recent study of party-related posts on social media in Germany showcases that politicians from parties on the political fringes are more engaged and successful in their social media presence. Posts that are in connection to extremer parties are shown much quicker than posts of parties in the political centre [@verwiebe_digitalisiert_2025]. Political entertainment is just one topic displayed on social media feeds along with comedy, lifestyle, technology, gaming, cooking and more. This way, political information seamlessly reaches broader audiences. This shows the potential of social media as a political tool and also how important it is to employ tactics that play into the preferences of the algorithms.
 
 ## The research gap
 
@@ -125,6 +125,8 @@ Using a BERT model and fine-tuning it myself is a common approach and recently e
 Conduct a sentiment analysis for speeches in the German Bundestag over the last X years.
 
 Correlate with relevance of social media (what measures relevance? user numbers? time spent on / usage frequency of social media? share of people using social media as their main source of information?) --\> which survey data to use?
+
+--> multivariate time series analysis
 
 Idea for descriptive stat:
 
