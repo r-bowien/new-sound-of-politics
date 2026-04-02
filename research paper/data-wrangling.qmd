@@ -17,10 +17,12 @@ library(ggplot2)
 library(dplyr)
 ```
 
+
+# Part 1: Social media 
 ```{r}
 
-gles_data <- haven::read_dta("new-sound-of-politics/data/ZA6832_v2-0-0.dta")
-gles_korresp <- readxl::read_xlsx("new-sound-of-politics/data/ZA6832_v2-0-0_Korrespondenzliste.xlsx")
+gles_data <- haven::read_dta("data/ZA6832_v2-0-0.dta")
+gles_korresp <- readxl::read_xlsx("data/ZA6832_v2-0-0_Korrespondenzliste.xlsx")
 
 ```
 
@@ -49,6 +51,8 @@ print(info_source_data$m0001_3[1:10])
 info_source_data[info_source_data$m0001_3 %in% c(-99:-71), ] <- NA
 
 info_source_3 <- info_source_data[!is.na(info_source_data$m0001_3), ]
+
+write.csv(info_source_3, "data/sm_relevance.csv")
 
 # From when on is social media included?
 
@@ -82,3 +86,36 @@ ggplot(data = data_ts_linechart, aes(x=field_start, y=prop_sm, group = 1)) +
 
 
 ```
+
+
+We can observe a clear positive trend of the relevance of social media as a political information source.
+
+
+# Part 2: Bundestag speeches
+
+```{r}
+# bt_speeches <- read.csv("data/Bundestag.csv")
+# bt_speeches_from2020 <- bt_speeches[bt_speeches$Date >= 2020,]
+# write.csv(bt_speeches_from2020, "bundestag_seit2020.csv")
+
+bt_speeches <- read.csv("data/bundestag_seit2020.csv")
+```
+
+```{r}
+bt_speeches_nointerjections <- bt_speeches[bt_speeches$Interjection == "False", ]
+bt_speeches_nointerjections[1:2,]
+```
+Do I need to concatenate the speeches or should I leave them like this? Yes because I want one document to be one speech and not one random part of a speech.
+Note: some speakers could not be identified and have the MPID 0. These speakers will be excluded at this time.
+```{r}
+
+bt_speeches_nounidentified <- bt_speeches_nointerjections |> filter(MPID != 0)
+bt_speeches_combined <- bt_speeches_nounidentified |> group_by(MPID, Date, Chair, Session, Period, Party) |>
+arrange(X, .bygroup=TRUE) |>
+summarise(Speech = paste(Speech, collapse=" "))
+
+bt_speeches_combined |> nrow()
+bt_speeches_combined$Date |> max()
+```
+The dataset contains 22137 speeches from 2020 to 2023
+
