@@ -18,9 +18,12 @@ The next step is to calculate the proportion of social media as most important i
 
 
 ```{r}
+library(ggplot2)
+library(dplyr)
 
-
-data_ts_linechart <- info_source_3 |> group_by(field_start) |> summarise(prop_sm = mean(m0001_3 == 4))
+data_sm_relevance <- read.csv("data/sm_relevance.csv")
+colnames(data_ts_linechart)
+data_ts_linechart <- data_sm_relevance |> group_by(field_start) |> summarise(prop_sm = mean(m0001_3 == 4))
 
 ggplot(data = data_ts_linechart, aes(x=field_start, y=prop_sm, group = 1)) +
   geom_line()
@@ -35,7 +38,7 @@ ggplot(data = data_ts_linechart, aes(x=field_start, y=prop_sm, group = 1)) +
 load the data
 ```{r}
 
-bt_speeches <- read.csv("data/bundesta_seit2020.csv")
+bt_speeches <- read.csv("data/bundestag_seit2020.csv")
 
 
 ```
