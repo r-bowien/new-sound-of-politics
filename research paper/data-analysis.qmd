@@ -7,3 +7,51 @@ authors:
     corresponding: true
 bibliography: references.bib
 ---
+
+
+
+# Descriptive Data analysis
+
+## Social Media relevance
+
+The next step is to calculate the proportion of social media as most important information source and then plot the development over time.
+
+
+```{r}
+
+
+data_ts_linechart <- info_source_3 |> group_by(field_start) |> summarise(prop_sm = mean(m0001_3 == 4))
+
+ggplot(data = data_ts_linechart, aes(x=field_start, y=prop_sm, group = 1)) +
+  geom_line()
+
+
+```
+
+
+## Bundestag Speeches
+
+
+load the data
+```{r}
+
+bt_speeches <- read.csv("data/bundesta_seit2020.csv")
+
+
+```
+calculate summary statisitics
+
+
+```{r}
+
+bt_speeches <- bt_speeches |> group_by(Party) |> mutate(n_party_members = length(unique(MPID)))
+
+sum_stat = subset(bt_speeches, select = c("Party", "n_party_members")) |> unique()
+
+print(sum_stat)
+print(bt_speeches[bt_speeches$n_party_members == max(bt_speeches$n_party_members),]$Party |> unique())
+
+```
+Note: If populist sentiment analysis is too difficult, go for pos/neg sentiment analysis --> neg. sentiment does better on social media, success strategy for right wing, positive sentiment more for left wing parties
+
+

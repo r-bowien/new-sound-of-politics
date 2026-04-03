@@ -1,6 +1,6 @@
 ---
-title: The New Sound of Politics
-authors:
+title: "WIP sometime publish"
+format: html
   - name: Robert Bowien
     affiliation: University College Dublin
     roles: writing
@@ -123,17 +123,13 @@ H2b: Extreme parties in opposition should show the highest level of populist rhe
 
 It is still contested and context-dependent how populist rhetoric should be operationalised [@popping_measuring_2018]. Before the availability of transformer models, traditional natural language processing (NLP) often employed dictionary based methods like bag-of-words approaches. These approaches are very reliable and reproducable but face significant challenges when it comes to complex lingual patterns. Populist rhetoric is full of various linguistic tricks which often are not difficult to define and capture. Furthermore, dictionaries designed to capture populism often differ and it is not clear when a dictionary is extensive [@pauwels_chapter_2017].
 
-Recent literature has argued for distinguishing between rational critique of the elites and populist language by adding a moralistic framework to the identifying features [@erhard_popbert_2025]. This work builds heavily on the work of @erhard_popbert_2025 who have created a transformer model specialized in identifying populist rhetoric in accordance to the previously discussed defining features.
-
-TODO: change lit review to be in accordance with method section!!
+Recent literature has argued for distinguishing between rational critique of the elites and populist language by adding a moralistic framework to the identifying features [@erhard_popbert_2025].
 
 This paper does not classify the examined speakers as populist or non-populist actors. It relies on a transformer based model to identify populist rhetoric across all types of speakers since the goal of this work is to identify differences in language over time and between parties.
 
 Using a finetuned transformer model has been the quantitative method of choice for most recent research on populist rhetoric. 
 Recent research on German populist rhetoric has employed a BERT (Bidirectional Encoder Representations from Transformers) model and fine-tuned it to avoid dichotomous classifying of populism and rather classify aspects of their communications [@erhard_popbert_2025]. 
-This paper follows a similar approach in many aspects, but it differs in small, but relevant details. @erhard_popbert_2025 used PopBERT, a fine tuned version of the GBERT model, which is the German version of BERT. Since the model has already been trained on parliamentary speeches from the Bundestag and is fine tuned to identify populist rhetoric, no fine-tuning is needed anymore. It can be directly released on the more recent data this paper aims to examine. Contrary to @erhard_popbert_2025 the model will classify populist rhetoric on speech level
-
-TODO: Run popbert on most recent speeches
+This paper follows a similar approach in many aspects, but it differs in small, but relevant details. @erhard_popbert_2025 used PopBERT, a fine tuned version of the GBERT model, which is the German version of BERT. Since the model has already been trained on parliamentary speeches from the Bundestag and is fine tuned to identify populist rhetoric, no fine-tuning is needed anymore. It can be directly released on the more recent data this paper aims to examine.
 
 Conduct a sentiment analysis for speeches in the German Bundestag over the last X years.
 

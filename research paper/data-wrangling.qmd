@@ -73,19 +73,7 @@ hist(data_hist_sample54$m0001_3)
 
 ```
 
-The next step is to calculate the proportion of social media as most important information source and then plot the development over time.
 
-
-```{r}
-
-
-data_ts_linechart <- info_source_3 |> group_by(field_start) |> summarise(prop_sm = mean(m0001_3 == 4))
-
-ggplot(data = data_ts_linechart, aes(x=field_start, y=prop_sm, group = 1)) +
-  geom_line()
-
-
-```
 
 
 We can observe a clear positive trend of the relevance of social media as a political information source.
@@ -96,14 +84,16 @@ We can observe a clear positive trend of the relevance of social media as a poli
 ```{r}
 # bt_speeches <- read.csv("data/Bundestag.csv")
 # bt_speeches_from2020 <- bt_speeches[bt_speeches$Date >= 2020,]
-# write.csv(bt_speeches_from2020, "bundestag_seit2020.csv")
+# write.csv(bt_speeches_combined, "bundestag_seit2020.csv")
 
 bt_speeches <- read.csv("data/bundestag_seit2020.csv")
+bt_meta <- read.csv("data/all_mps_meta.csv", sep = ";")
 ```
 
 ```{r}
+bt_speeches <- merge(bt_speeches, bt_meta, by="MPID")
 bt_speeches_nointerjections <- bt_speeches[bt_speeches$Interjection == "False", ]
-bt_speeches_nointerjections[1:2,]
+
 ```
 Do I need to concatenate the speeches or should I leave them like this? Yes because I want one document to be one speech and not one random part of a speech.
 Note: some speakers could not be identified and have the MPID 0. These speakers will be excluded at this time.
@@ -115,7 +105,9 @@ arrange(X, .bygroup=TRUE) |>
 summarise(Speech = paste(Speech, collapse=" "))
 
 bt_speeches_combined |> nrow()
-bt_speeches_combined$Date |> max()
+bt_speeches_combined$Date |> min()
+
+
 ```
-The dataset contains 22137 speeches from 2020 to 2023
+The dataset contains 22137 speeches from 2020-01-15 to 2023-04-26
 
