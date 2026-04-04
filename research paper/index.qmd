@@ -110,7 +110,7 @@ H2b: Extreme parties in opposition should show the highest level of populist rhe
 
 # Methodology
 
-It is still contested and context-dependent how populist rhetoric should be operationalised [@popping_measuring_2018]. Before the availability of transformer models, traditional natural language processing (NLP) often employed dictionary based methods like bag-of-words approaches. These approaches are very reliable and reproducable but face significant challenges when it comes to complex lingual patterns. Populist rhetoric is full of various linguistic tricks which often are not difficult to define and capture. Furthermore, dictionaries designed to capture populism often differ and it is not clear when a dictionary is extensive [@pauwels_chapter_2017].
+It is still contested and context-dependent how populist rhetoric should be operationalised [@popping_measuring_2018]. Before the availability of transformer models, traditional natural language processing (NLP) often employed dictionary based methods like bag-of-words approaches. These approaches are very reliable and reproducable but face significant challenges when it comes to complex lingual patterns. Populist rhetoric is full of various linguistic tricks which often are not difficult to define and capture. Furthermore, dictionaries designed to capture populism often differ and it is not clear when a dictionary is extensive [@pauwels_chapter_2017]. Transformer models offer a promising approach to successfully identify populist rhetoric [@erhard_popbert_2025, @bonikowski_politics_2022]
 
 Recent literature has argued for distinguishing between rational critique of the elites and populist language by adding a moralistic framework to the identifying features [@erhard_popbert_2025]. The method of this paper builds heavily on the work of @erhard_popbert_2025 who have created a transformer model specialized in identifying populist rhetoric in accordance to the previously discussed defining features.
 
@@ -119,9 +119,16 @@ TODO: change lit review to be in accordance with method section!!
 
 Using a finetuned transformer model has been the quantitative method of choice for most recent research on populist rhetoric. 
 Recent research on German populist rhetoric has employed a BERT (Bidirectional Encoder Representations from Transformers) model and fine-tuned it to avoid dichotomous classifying of populism and rather classify aspects of their communications [@erhard_popbert_2025]. 
-This paper follows a similar approach in many aspects, but it differs in small, but relevant details. @erhard_popbert_2025 used PopBERT, a fine tuned version of the GBERT model, which is the German version of BERT. Since the model has already been trained on parliamentary speeches from the Bundestag and is fine tuned to identify populist rhetoric, no fine-tuning is needed anymore. It can be directly applied to the more recent data this paper aims to examine. Contrary to @erhard_popbert_2025 the model will classify populist rhetoric on speech level.
+This paper follows a similar approach in many aspects, but it differs in small, but relevant details. @erhard_popbert_2025 used PopBERT, a fine tuned version of the GBERT model, which is the German version of BERT. Since the model has already been trained on parliamentary speeches from the Bundestag and is fine tuned to identify populist rhetoric, no fine-tuning is needed anymore. It can be directly applied to the more recent data this paper aims to examine. Contrary to @erhard_popbert_2025 the model will classify populist rhetoric on speech level instead of sentence level. This is done for two reasosn.
 
-This paper does not classify the examined speakers as populist or non-populist actors. It relies on PopBERT to identify populist rhetoric across all types of speakers since the goal of this work is to identify differences in language over time and between parties.
+First, the available data from SpeakGer comes on speech level. Splitting the speeches into sentences may wrongly split sentences at spots where they should not be split and vice versa. Parliamentary often are no cleanly written texts. During a speech there might be interventions or slips of the tongue that lead to difficulties in determining the end and beginning of sentences.
+
+Second, classifying on speech level avoids loosing any information. Two sentences on their own might not be enough to identify populist rhetoric, but when they are taken together, they might prove to be populist.
+
+This paper does not classify the examined speakers as populist or non-populist actors. It relies on PopBERT to identify populist rhetoric across all types of speakers since the goal of this work is to identify differences in language over time and between parties and not to determine dichotomously who is populist and who is not.
+
+The SpeakGer speech corpus is used because it is the most recent easily accessible and complete dataset on Bundestag speeches. It includes all speeches from 1947 until 2023. This work focuses on the most recent period from 2020 until 2023, which was not examined by @erhard_popbert_2025. Furthermore, speeches from speakers who were not identified and all interjections are excluded.
+
 TODO: Run popbert on most recent speeches
 
 Conduct a sentiment analysis for speeches in the German Bundestag over the last X years.
@@ -136,9 +143,15 @@ Check in how many speeches the word gendern occurs across parties in the Bundest
 
 # Results and Discussion
 
+
+
+
+
 TODO: interesting to check Die Linke since they split into Linke and BSW.
 
 ## Limitations
+
+Robustness checks for the transformer model have not been sufficiently conducted due to a lack of resources. It relies on the robustnesschecks of @erhard_popbert_2025 which have been conducted on older Bundestag speech data.
 
 This paper is limited to data on parliamentary speeches and unrelated social media metrics. To consolidate inferences about a change in parliamentary rhetoric due to the increased relevance of social media, more data is needed. Matching social media posts with speeches in a quantitative rather than limited descriptive manner (like in this paper) would provide a clear image of which and when specific rhetoric is employed in parliament.
 

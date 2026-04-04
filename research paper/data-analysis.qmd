@@ -21,6 +21,9 @@ The next step is to calculate the proportion of social media as most important i
 library(ggplot2)
 library(dplyr)
 
+```
+```{r}
+
 data_sm_relevance <- read.csv("data/sm_relevance.csv")
 colnames(data_ts_linechart)
 data_ts_linechart <- data_sm_relevance |> group_by(field_start) |> summarise(prop_sm = mean(m0001_3 == 4))
@@ -32,13 +35,14 @@ ggplot(data = data_ts_linechart, aes(x=field_start, y=prop_sm, group = 1)) +
 ```
 
 
+
 ## Bundestag Speeches
 
 
 load the data
 ```{r}
 
-bt_speeches <- read.csv("data/bundestag_seit2020.csv")
+bt_speeches <- read.csv("data/bundestag_seit2020_predicted.csv")
 
 
 ```
@@ -57,4 +61,11 @@ print(bt_speeches[bt_speeches$n_party_members == max(bt_speeches$n_party_members
 ```
 Note: If populist sentiment analysis is too difficult, go for pos/neg sentiment analysis --> neg. sentiment does better on social media, success strategy for right wing, positive sentiment more for left wing parties
 
+```{r}
+colnames(bt_speeches)
+score_over_time <- ggplot(bt_speeches, aes(x=Date, y=LABEL_0, group=Party)) +
+geom_point() +
+geom_smooth()
+score_over_time
 
+```
