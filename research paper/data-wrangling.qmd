@@ -82,16 +82,15 @@ We can observe a clear positive trend of the relevance of social media as a poli
 # Part 2: Bundestag speeches
 
 ```{r}
-# bt_speeches <- read.csv("data/Bundestag.csv")
-# bt_speeches_from2020 <- bt_speeches[bt_speeches$Date >= 2020,]
-# write.csv(bt_speeches_combined, "bundestag_seit2020.csv")
+bt_speeches_dat <- read.csv("data/Bundestag.csv")
+bt_speeches <- bt_speeches_dat[bt_speeches_dat$Period >= 18,]
 
-bt_speeches <- read.csv("data/bundestag_seit2020.csv")
+# bt_speeches <- read.csv("data/bundestag_seit2020.csv")
 bt_meta <- read.csv("data/all_mps_meta.csv", sep = ";")
 ```
 
 ```{r}
-bt_speeches <- merge(bt_speeches, bt_meta, by="MPID")
+
 bt_speeches_nointerjections <- bt_speeches[bt_speeches$Interjection == "False", ]
 
 ```
@@ -101,13 +100,23 @@ Note: some speakers could not be identified and have the MPID 0. These speakers 
 
 bt_speeches_nounidentified <- bt_speeches_nointerjections |> filter(MPID != 0)
 bt_speeches_combined <- bt_speeches_nounidentified |> group_by(MPID, Date, Chair, Session, Period, Party) |>
-arrange(X, .bygroup=TRUE) |>
-summarise(Speech = paste(Speech, collapse=" "))
+arrange(.bygroup=TRUE) |>
+summarise(Speech = paste(Speech, collapse="-|-"))
 
-bt_speeches_combined |> nrow()
-bt_speeches_combined$Date |> min()
+bt_speeches_combined |> nrow() |> print()
+bt_speeches_combined$Date |> min() |> print()
+head(bt_speeches_combined)
 
+
+bt_speeches_combined <- merge(bt_speeches, bt_meta, by="MPID", all.x = TRUE)
+
+write.csv(bt_speeches_combined, "data/bundestag_181920.csv")
 
 ```
-The dataset contains 22137 speeches from 2020-01-15 to 2023-04-26
+The dataset bundestag_seit2020 contains 22137 speeches from 2020-01-15 to 2023-04-26
+
+The dataset bundestag_181920 contains 57041 speeches from 2013-10-22 to 2023-04-26
+
+Running transformer model PopBERT by luerhard
+
 

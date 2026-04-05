@@ -24,12 +24,12 @@ library(dplyr)
 ```
 ```{r}
 
-data_sm_relevance <- read.csv("data/sm_relevance.csv")
-colnames(data_ts_linechart)
-data_ts_linechart <- data_sm_relevance |> group_by(field_start) |> summarise(prop_sm = mean(m0001_3 == 4))
+# data_sm_relevance <- read.csv("data/sm_relevance.csv")
+# colnames(data_ts_linechart)
+# data_ts_linechart <- data_sm_relevance |> group_by(field_start) |> summarise(prop_sm = mean(m0001_3 == 4))
 
-ggplot(data = data_ts_linechart, aes(x=field_start, y=prop_sm, group = 1)) +
-  geom_line()
+# ggplot(data = data_ts_linechart, aes(x=field_start, y=prop_sm, group = 1)) +
+#   geom_line()
 
 
 ```
@@ -62,10 +62,27 @@ print(bt_speeches[bt_speeches$n_party_members == max(bt_speeches$n_party_members
 Note: If populist sentiment analysis is too difficult, go for pos/neg sentiment analysis --> neg. sentiment does better on social media, success strategy for right wing, positive sentiment more for left wing parties
 
 ```{r}
+bt_speeches <- bt_speeches |> mutate(Populist_aggregated = (LABEL_0 + LABEL_1 + LABEL_2 + LABEL_3)/4)
+
+
+names(bt_speeches)[names(bt_speeches) == "LABEL_0"] <- "Anti-Elitism"
+names(bt_speeches)[names(bt_speeches) == "LABEL_1"] <- "People-Centrism"
+names(bt_speeches)[names(bt_speeches) == "LABEL_2"] <- "Left-Wing-Host-Ideology"
+names(bt_speeches)[names(bt_speeches) == "LABEL_3"] <- "Right-Wing-Host-Ideology"
+```
+
+```{r}
 colnames(bt_speeches)
-score_over_time <- ggplot(bt_speeches, aes(x=Date, y=LABEL_0, group=Party)) +
+score_over_time <- ggplot(bt_speeches, aes(x=Date, y=LABEL_0, group=Party, color=Party)) +
 geom_point() +
-geom_smooth()
+geom_smooth() +
+facet_wrap( ~ Party)
 score_over_time
 
+```
+
+```{r}
+bt_speeches <- bt_speeches |> group_by(MPID) |> mutate(mean_pop_per_speaker = mean(Populist_aggregated))
+
+bt_speeches |> arrange(desc(mean_pop_per_speaker)) |> subset(select=c(MPID, mean_pop_per_speaker, Party, Speech))
 ```

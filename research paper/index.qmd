@@ -129,6 +129,10 @@ This paper does not classify the examined speakers as populist or non-populist a
 
 The SpeakGer speech corpus is used because it is the most recent easily accessible and complete dataset on Bundestag speeches. It includes all speeches from 1947 until 2023. This work focuses on the most recent period from 2020 until 2023, which was not examined by @erhard_popbert_2025. Furthermore, speeches from speakers who were not identified and all interjections are excluded.
 
+
+
+
+
 TODO: Run popbert on most recent speeches
 
 Conduct a sentiment analysis for speeches in the German Bundestag over the last X years.
@@ -143,7 +147,7 @@ Check in how many speeches the word gendern occurs across parties in the Bundest
 
 # Results and Discussion
 
-
+Goal: Show how populist rhetoric developed over time (from 2015)
 
 
 
@@ -152,6 +156,8 @@ TODO: interesting to check Die Linke since they split into Linke and BSW.
 ## Limitations
 
 Robustness checks for the transformer model have not been sufficiently conducted due to a lack of resources. It relies on the robustnesschecks of @erhard_popbert_2025 which have been conducted on older Bundestag speech data.
+
+PopBERT has been trained on time-specific data. It is therefore not ensured that it performs the same on data that is more recent. This is problematic because this work explicitly aims to examine how populist rhetoric changes over time. Using a model trained on speeches from an earlier time period might reduce its performance (TODO: what metrics may be reduced?). However, using the same model ensures that any differences identified do not come from any differences in the transformer model. 
 
 This paper is limited to data on parliamentary speeches and unrelated social media metrics. To consolidate inferences about a change in parliamentary rhetoric due to the increased relevance of social media, more data is needed. Matching social media posts with speeches in a quantitative rather than limited descriptive manner (like in this paper) would provide a clear image of which and when specific rhetoric is employed in parliament.
 
