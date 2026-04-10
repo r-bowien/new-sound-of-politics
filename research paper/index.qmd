@@ -123,13 +123,15 @@ This paper follows a similar approach in many aspects, but it differs in small, 
 
 First, the available data from SpeakGer comes on speech level. Splitting the speeches into sentences may wrongly split sentences at spots where they should not be split and vice versa. Parliamentary often are no cleanly written texts. During a speech there might be interventions or slips of the tongue that lead to difficulties in determining the end and beginning of sentences.
 
-Second, classifying on speech level avoids loosing any information. Two sentences on their own might not be enough to identify populist rhetoric, but when they are taken together, they might prove to be populist.
+Second, classifying on speech level would prevent missing any context information. Two sentences on their own might not be enough to identify populist rhetoric, but when they are taken together, they might prove to be populist. However, the PopBERT is limited to 512 tokens per classification, which would require chunking speeches to avoid truncating them. This would keep more context information but the chunk might split mid-sentence which would cause again loss of information. Therefore, this work sticks to classifying on sentence level, which is closest to the method used by @erhard_popbert_2025.
+
+The dataset is constructed of speech snippets in the German Bundestag. One speech can be reconstructed by grouping the data by speaker, session, date and (... TODO: exact description of coding!). However, the data are not perfectly clean. Some snippets include meta data and random spots often mid-word, e.g.: "[...]Der Abgeordnete Dr. Norbert Lammert ist vorge Deutscher Bundestag – 18. Wahlperiode – 1. Sitzung. Berlin, Dienstag, den 22. Oktober 2013 5 Alterspräsident Dr. Heinz Riesenhuber" where the next snippet begins with " schlagen worden. – Ich sehe keine weiteren Vorschläge, ich höre keinen Widerspruch.[...]". To clean this as good as possible, a removing regex pattern has been applied to the corpus before splitting the speeches into sentences. Furthermore, all snippets that are interjections and not part of a speak and snippets where the speaker could not be identified are removed from the dataset. This leaves us with XXXX sentences or XXX speeches from 20XX to 2023.
 
 This paper does not classify the examined speakers as populist or non-populist actors. It relies on PopBERT to identify populist rhetoric across all types of speakers since the goal of this work is to identify differences in language over time and between parties and not to determine dichotomously who is populist and who is not.
 
 The SpeakGer speech corpus is used because it is the most recent easily accessible and complete dataset on Bundestag speeches. It includes all speeches from 1947 until 2023. This work focuses on the most recent period from 2020 until 2023, which was not examined by @erhard_popbert_2025. Furthermore, speeches from speakers who were not identified and all interjections are excluded.
 
-
+Although extensive measures to clean the corpus have been undertaken, some limitations remain. Whenever there is a parliamentary interview, both the question and the answer are treated as speeches by the questioner. In some cases this could influence the amount of populism attributed to one speaker. However, this bias should be random since both questioner and interviewed could be employing populist rhetoric. The effort to remove those parts would exceed the benefit they pose for data quality.
 
 
 
@@ -154,6 +156,10 @@ Goal: Show how populist rhetoric developed over time (from 2015)
 TODO: interesting to check Die Linke since they split into Linke and BSW.
 
 ## Limitations
+
+To adhere to the environment the model was trained in, the speeches will be split into sentences for classification and the level and type of populism was evaluated on sentence level. This approach however may miss out on some information existing in the context of a whole speech.
+
+
 
 Robustness checks for the transformer model have not been sufficiently conducted due to a lack of resources. It relies on the robustnesschecks of @erhard_popbert_2025 which have been conducted on older Bundestag speech data.
 

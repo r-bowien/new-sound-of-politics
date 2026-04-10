@@ -42,8 +42,7 @@ library(dplyr)
 load the data
 ```{r}
 
-bt_speeches <- read.csv("data/bundestag_seit2020_predicted.csv")
-
+bt_speeches <- read.csv("data/bundestag_181920.csv")
 
 ```
 calculate summary statisitics
@@ -60,6 +59,18 @@ print(bt_speeches[bt_speeches$n_party_members == max(bt_speeches$n_party_members
 
 ```
 Note: If populist sentiment analysis is too difficult, go for pos/neg sentiment analysis --> neg. sentiment does better on social media, success strategy for right wing, positive sentiment more for left wing parties
+
+QTA methods
+
+```{r}
+
+bt_speeches|> head()
+```
+
+
+
+
+PopBERT evaluation
 
 ```{r}
 bt_speeches <- bt_speeches |> mutate(Populist_aggregated = (LABEL_0 + LABEL_1 + LABEL_2 + LABEL_3)/4)

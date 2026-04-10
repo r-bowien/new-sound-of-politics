@@ -15,26 +15,28 @@ First, the relevant libraries and data are loaded. Then, time-series data from t
 ```{r}
 library(ggplot2)
 library(dplyr)
+library(stringfish)
+library(stringr)
 ```
 
 
 # Part 1: Social media 
 ```{r}
 
-gles_data <- haven::read_dta("data/ZA6832_v2-0-0.dta")
-gles_korresp <- readxl::read_xlsx("data/ZA6832_v2-0-0_Korrespondenzliste.xlsx")
+# gles_data <- haven::read_dta("data/ZA6832_v2-0-0.dta")
+# gles_korresp <- readxl::read_xlsx("data/ZA6832_v2-0-0_Korrespondenzliste.xlsx")
 
 ```
 
 ```{r}
-nrow(gles_data)
-nrow(gles_korresp)
+# nrow(gles_data)
+# nrow(gles_korresp)
 
-print(gles_korresp[grepl("Pol. Mediennutzun", gles_korresp$Variablenlabel),c("Variablenname", "Variablenlabel")])
+# print(gles_korresp[grepl("Pol. Mediennutzun", gles_korresp$Variablenlabel),c("Variablenname", "Variablenlabel")])
 
-colnames(gles_data)
+# colnames(gles_data)
 
-info_source_data <- gles_data |> subset(select = c("field_start", "field_end", "sample", "version", "lfdn", "lfdn_od", "m0001_1", "m0001_2", "m0001_3")) # m0001_1 does not yet include social media, social media in there since 2012
+# info_source_data <- gles_data |> subset(select = c("field_start", "field_end", "sample", "version", "lfdn", "lfdn_od", "m0001_1", "m0001_2", "m0001_3")) # m0001_1 does not yet include social media, social media in there since 2012
 
 
 
@@ -44,31 +46,31 @@ Now, we have a first look at the data. Mainly interesting to us is the data that
 - how is the data distributed for the oldest and the latest year?
 - how did it develop over time?
 ```{r}
-print(info_source_data$m0001_1[1:10])
-print(info_source_data$m0001_2[1:10])
-print(info_source_data$m0001_3[1:10])
+# print(info_source_data$m0001_1[1:10])
+# print(info_source_data$m0001_2[1:10])
+# print(info_source_data$m0001_3[1:10])
 
-info_source_data[info_source_data$m0001_3 %in% c(-99:-71), ] <- NA
+# info_source_data[info_source_data$m0001_3 %in% c(-99:-71), ] <- NA
 
-info_source_3 <- info_source_data[!is.na(info_source_data$m0001_3), ]
+# info_source_3 <- info_source_data[!is.na(info_source_data$m0001_3), ]
 
-write.csv(info_source_3, "data/sm_relevance.csv")
+# write.csv(info_source_3, "data/sm_relevance.csv")
 
 # From when on is social media included?
 
-min(info_source_3$field_start)
-unique(info_source_3$field_start)
-length(unique(info_source_3$lfdn_od))
-nrow(info_source_3)
+# min(info_source_3$field_start)
+# unique(info_source_3$field_start)
+# length(unique(info_source_3$lfdn_od))
+# nrow(info_source_3)
 
-info_source_3[info_source_3$lfdn_od == 30, ]
-# --> the respondent id is lfdn_od
+# info_source_3[info_source_3$lfdn_od == 30, ]
+# # --> the respondent id is lfdn_od
 
-data_hist_sample54 <- info_source_3[info_source_3$sample == 54, ]
-data_hist_sample46 <- info_source_3[info_source_3$sample == 46, ]
+# data_hist_sample54 <- info_source_3[info_source_3$sample == 54, ]
+# data_hist_sample46 <- info_source_3[info_source_3$sample == 46, ]
 
-hist(data_hist_sample46$m0001_3)
-hist(data_hist_sample54$m0001_3)
+# hist(data_hist_sample46$m0001_3)
+# hist(data_hist_sample54$m0001_3)
 
 
 ```
@@ -85,7 +87,7 @@ We can observe a clear positive trend of the relevance of social media as a poli
 bt_speeches_dat <- read.csv("data/Bundestag.csv")
 bt_speeches <- bt_speeches_dat[bt_speeches_dat$Period >= 18,]
 
-# bt_speeches <- read.csv("data/bundestag_seit2020.csv")
+# bt_speeches <- read.csv("data/bundestag_181920.csv")
 bt_meta <- read.csv("data/all_mps_meta.csv", sep = ";")
 ```
 
@@ -98,7 +100,8 @@ Do I need to concatenate the speeches or should I leave them like this? Yes beca
 Note: some speakers could not be identified and have the MPID 0. These speakers will be excluded at this time.
 ```{r}
 
-bt_speeches_nounidentified <- bt_speeches_nointerjections |> filter(MPID != 0)
+bt_speeches_nounidentified <- bt_speeches_nointerjections |> dplyr::filter(MPID != 0)
+
 bt_speeches_combined <- bt_speeches_nounidentified |> group_by(MPID, Date, Chair, Session, Period, Party) |>
 arrange(.bygroup=TRUE) |>
 summarise(Speech = paste(Speech, collapse="-|-"))
@@ -108,9 +111,62 @@ bt_speeches_combined$Date |> min() |> print()
 head(bt_speeches_combined)
 
 
-bt_speeches_combined <- merge(bt_speeches, bt_meta, by="MPID", all.x = TRUE)
+# names_bt_members <- bt_meta$Name |> unique() |> paste0(collapse = "|")
+names_bt_members_list <- unique(bt_meta$Name) |> list()
+names_bt_members <- split(names_bt_members_list[[1]], ceiling(seq_along(names_bt_members_list[[1]])/300))
 
-write.csv(bt_speeches_combined, "data/bundestag_181920.csv")
+# chunk_size <- round(nchar(names_bt_members) / 20)
+# names_bt_members_list <- substring(names_bt_members,
+#                    first = seq(1, nchar(names_bt_members), by = chunk_size),
+#                    last  = seq(chunk_size, nchar(names_bt_members), by = chunk_size))
+
+names_bt_members_rgx <- sapply(names_bt_members, function(names){
+  gsub(" \(.+\)", "", paste0(names, collapse="|"))
+})
+
+
+
+```
+```{r}
+remove_regex_base = "(\d{4} )?Deutscher Bundestag – \d{2} ?. Wahlperiode – \d+ ?. Sitzung ?. Berlin, ((Mon|Diens|Donners|Frei|Sams|Sonn)tag|Mittwoch), den \d+ ?. (Januar|Februar|M(ä|ae)rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember) \d{4,}( \d*)?"
+
+
+remove_regexes = sapply(names_bt_members_rgx, function(regex) {paste0("(", regex, ")? ?", remove_regex_base, "( (Alterspr(ä|ae)sident|Parl. Staatssekret(ä|ae)r) (\w{2,4}\. ){0,2}(", regex,")?)?")})
+
+bt_speeches_combined_clean <- bt_speeches_combined
+
+for (n in seq(1:length(remove_regexes))){
+  rgx <- remove_regexes[n]
+  print(paste0("rgx group: ", n, " of ", length(remove_regexes)))
+  # Source - https://stackoverflow.com/a/78270004
+  # Posted by LMc
+  # Retrieved 2026-04-08, License - CC BY-SA 4.0
+  bt_speeches_combined_clean$Speech <- sf_gsub(bt_speeches_combined_clean$Speech, rgx, "", nthreads = 4)
+}
+
+
+# remove_regex = paste0(remove_regex_base, remove_regex_add2)
+# bt_speeches_combined_clean <- bt_speeches_combined_clean |> mutate(Speech = gsub(remove_regex, "", Speech))
+
+
+```
+
+```{r}
+
+
+bt_speeches_combined_clean$speech_id <- seq_len(nrow(bt_speeches_combined_clean))
+
+bt_speeches_meta <- merge(bt_speeches_combined_clean, bt_meta, by="MPID", all.x = TRUE) |> arrange(speech_id)
+
+
+bt_speeches_meta[bt_speeches_meta$Name == "Ralf Brauksiepe", ] |> head()
+
+```
+
+
+
+```{r}
+write.csv(bt_speeches_meta, "data/bundestag_cleaned_periods181920.csv")
 
 ```
 The dataset bundestag_seit2020 contains 22137 speeches from 2020-01-15 to 2023-04-26
