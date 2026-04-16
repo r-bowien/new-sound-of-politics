@@ -58,10 +58,8 @@ print(sum_stat)
 print(bt_speeches[bt_speeches$n_party_members == max(bt_speeches$n_party_members),]$Party |> unique())
 
 ```
-Note: If populist sentiment analysis is too difficult, go for pos/neg sentiment analysis --> neg. sentiment does better on social media, success strategy for right wing, positive sentiment more for left wing parties
 
 QTA methods
-
 ```{r}
 
 bt_speeches|> head()
