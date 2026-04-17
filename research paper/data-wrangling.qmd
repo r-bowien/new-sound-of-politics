@@ -92,6 +92,9 @@ bt_speeches <- bt_speeches_dat[bt_speeches_dat$Period >= 20,]
 # bt_speeches <- read.csv("data/bundestag_181920.csv")
 bt_meta <- read.csv("data/all_mps_meta.csv", sep = ";")
 ```
+```{r}
+nrow(bt_speeches) |> print()
+```
 
 ```{r}
 
@@ -191,11 +194,11 @@ bt_speeches_combined_clean |> head()
 
 ```{r}
 write.csv(bt_speeches_combined_clean, "data/bundestag_cleaned_period20.csv")
-
+bundestag_combined_clean <- read.csv("data/bundestag_cleaned_period20.csv")
 ```
 The dataset bundestag_seit2020 contains 
 ```{r}
-22137
+bundestag_combined_clean |> nrow()
 ```
 
 speeches from 2020-01-15 to 2023-04-26
