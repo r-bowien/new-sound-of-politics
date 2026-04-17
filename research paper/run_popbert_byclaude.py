@@ -10,7 +10,7 @@ model = AutoModelForSequenceClassification.from_pretrained("luerhard/PopBERT")
 model.eval()
 
 # Load data
-bt_speeches = pd.read_csv("data/bundestag_seit2020.csv", index_col="Unnamed: 0")
+bt_speeches = pd.read_csv("data/bundestag_seit181920.csv", index_col="Unnamed: 0")
 
 bt_speeches = bt_speeches.sample(frac=0.01)
 texts = list(bt_speeches["Speech"])
@@ -60,5 +60,4 @@ results = pd.concat([bt_speeches.reset_index(drop=True), prob_df], axis=1)
 
 print(results.head())
 results.to_csv("data/bundestag_seit2020_predicted.csv", index=False)
-
 
