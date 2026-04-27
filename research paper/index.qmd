@@ -6,7 +6,15 @@ authors:
     roles: writing
     corresponding: true
 bibliography: references.bib
+format: pdf
 ---
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(stringr)
+```
+
 
 # Introduction
 
@@ -73,6 +81,127 @@ Social media performance plays an increasingly important role in parties communi
 
 Some scholars distinguish between different forms of populist rhetoric, but often empirical studies only focus on a dichotomous interpretation of populist rhetoric. Furthermore, existing research demonstrates that populist rhetoric is widely utilised by political actors through social media (SOURCE!!!).
 
+Social media has established itself as the second most important source of political information. TDOD: Work this into paper: IF FINDINGS SHOW AfD and LINKE rhetoric adjusts to be more populist for social media, this might be one explanation for their recent success within young voting groups.
+
+```{r}
+
+# data_sm_relevance <- read.csv("data/sm_relevance.csv")
+data_sm_relevance <- readRDS("data/sm_relevance.rds")
+```
+```{r}
+
+# Compute share of each source within age group x wave
+df_counts <- data_sm_relevance |>
+  group_by(time_period, age_group, media_info_source) |>
+  summarise(n = n(), .groups = "drop") |>
+  group_by(time_period, age_group) |>
+  mutate(share = n / sum(n)) |>
+  ungroup()
+
+cbPalette <- c("#E69F00", "#009E73",  "#D55E00", "#56B4E9", "#F0E442", "#0072B2", "#CC79A7")
+
+# Colour palette per source
+source_palette <- data.frame(media = c("TV",
+  "Newspaper",
+  "Radio",
+  "Social media",
+  "Other Internetproviders",
+  "Personal conversation",
+  "Other source"),
+  colour = cbPalette
+)
+
+# create working colour palette
+source_palette <- setNames(source_palette$colour, source_palette$media)
+ 
+# Plot — faceted by age group, one line per source
+p1 <- ggplot(df_counts, aes(x = time_period, y = share, colour = media_info_source, group = media_info_source)) +
+  geom_line(linewidth = 0.9) +
+  geom_point(size = 2) +
+  facet_wrap(~ age_group, ncol = 1) +
+  scale_x_date(
+    date_labels = "%b %Y",
+    date_breaks = "6 months",
+    expand = expansion(mult = 0.03)
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    limits = c(0, NA)
+  ) +
+  scale_colour_manual(values = source_palette, name = "Information source") +
+  labs(
+    title    = "Information source by age group over time",
+    subtitle = "Share of respondents per source, split by age groups",
+    x        = "Survey period (start)",
+    y        = "Share"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title       = element_text(face = "bold", size = 14),
+    plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
+    legend.position  = "right",
+    axis.text.x      = element_text(angle = 30, hjust = 1),
+    panel.grid.minor = element_blank(),
+    strip.text       = element_text(face = "bold", size = 12)
+  )
+ 
+# Save
+# ggsave("plot_sources_by_agegroup.png", plot = p, width = 11, height = 9, dpi = 150)
+p1
+
+```
+
+```{r}
+
+# plot social media relevance over time by vote intention
+
+
+df_counts <- data_sm_relevance |>
+  group_by(time_period, vote_intention_zweitstimme, media_info_source) |>
+  summarise(n = n(), .groups = "drop") |>
+  group_by(time_period, vote_intention_zweitstimme) |>
+  mutate(share = n / sum(n)) |>
+  ungroup() |> filter(!is.na(vote_intention_zweitstimme))
+
+ 
+# Plot — faceted by age group, one line per source
+p2 <- ggplot(df_counts, aes(x = time_period, y = share, colour = media_info_source, group = media_info_source)) +
+  geom_line(linewidth = 0.9) +
+  geom_point(size = 2) +
+  facet_wrap(~ vote_intention_zweitstimme, ncol = 1) +
+  scale_x_date(
+    date_labels = "%b %Y",
+    date_breaks = "6 months",
+    expand = expansion(mult = 0.03)
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    limits = c(0, NA)
+  ) +
+  # scale_colour_manual(values = source_palette, name = "Vote intention") +
+  labs(
+    title    = "Political information source by vote intention (Zweitstimme) over time",
+    subtitle = "Share of respondents per source, split by vote intention",
+    x        = "Survey period (start)",
+    y        = "Share"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title       = element_text(face = "bold", size = 14),
+    plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
+    legend.position  = "right",
+    axis.text.x      = element_text(angle = 30, hjust = 1),
+    panel.grid.minor = element_blank(),
+    strip.text       = element_text(face = "bold", size = 12)
+  )
+
+# Save
+# ggsave("plot_sources_by_vote_intention.png", plot = p, width = 11, height = 9, dpi = 150)
+p2
+
+
+
+```
 While most studies mentioned do an important job of showing how social media is used to communicate to the public, no work has been aimed at the core of democratic discourse: the parliament. The parliament is the central institution of every democracy \[SOURCE\]. Its stated purpose is to provide meaningful discussion open to the public to keep the electorate informed and able to hold politicians accountable.
 
 Foregoing review of the literature mentioned a link between the use of social media by politicians and the rhetoric patterns in parliamentary speeches. Additionaly it has opened a door to examine the differing ways of populist rhetoric in those parliamentary speeches. This will be elaborated on in the following section on theoretical considerations.
@@ -83,7 +212,7 @@ This study aims to adress both. It builds on a theoretical framework for underst
 
 For political actors it is of crucial importance to be able to effectively communicate their ideas and messages to the electorate. In a quickly changing environment where social media is omnipresent and supports direct, raw and agitating messages, political actors are incentivised to develop new ways of communication that adhere to the rules of the algorithm in some way. The reviewed literature suggests that populism offers successful tools to achieve this.
 
-It is easier to critizise the ruling elites when you are in the opposition. In Germany, the parties known for populist rhetoric are the far left and far right parties which are not in power. We can expect them to use populist rhetoric to a greater extent as they do not have governing power. To therefore conclude that parties of the political centre do not use populist rhetoric would be wrong. Examples of elements of populist rhetoric can be examined across all parties, especially one particular element. Every political leader tries to appeal to the masses, often by pop-cultural ways. From highly professionalised but very approachable looking door-to-door campaigning of Robert Habeck in the latest parliamentary election to professionally unprofessional sausage devouring by Markus Söder, politicians find a way to make the masses feel close to that charismatic political figure.
+It is easier to critizise the ruling elites when you are in the opposition. In Germany, the parties known for populist rhetoric are the far left and far right parties which are not in power. We can expect them to use populist rhetoric to a greater extent as they do not have governing power. To therefore conclude that parties of the political centre do not use populist rhetoric would be wrong. Examples of elements of populist rhetoric can be examined across all parties, especially one particular element. Political leaders try to appeal to the masses, some more than others, often by pop-cultural ways. From "down to earth" asthetics campaigning of Robert Habeck in the latest parliamentary election to professionally unprofessional food blogging by Markus Söder, politicians find a way to make the masses feel close to that charismatic political figure.
 
 Hence, it seems that populist rhetoric is employed both in and out of government and even though it takes on different forms, no politician can escape it. The advantage of populist rhetoric lies in its ability to always offers the solution that nobody else offers. To be most credible with this unique solution, it is best to present yourself further away from the mainstream, where you can easily come up with something that is not commonly talked about, something that is unique and plays into the rules of algorithms. This should be easiest for opposition and extreme parties, which is why it can be expected that they were the first to adjust their rhetoric. With the ongoing success, moderate parties had to adjust aswell and even though they do not show their populist tools that obvious, they will have learned to utilise them by now.
 

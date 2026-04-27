@@ -23,8 +23,8 @@ library(stringr)
 # Part 1: Social media 
 ```{r}
 
-# gles_data <- haven::read_dta("data/ZA6832_v2-0-0.dta")
-# gles_korresp <- readxl::read_xlsx("data/ZA6832_v2-0-0_Korrespondenzliste.xlsx")
+gles_data <- haven::read_dta("data/ZA6832_v2-0-0.dta")
+gles_korresp <- readxl::read_xlsx("data/ZA6832_v2-0-0_Korrespondenzliste.xlsx")
 
 ```
 
@@ -32,11 +32,12 @@ library(stringr)
 # nrow(gles_data)
 # nrow(gles_korresp)
 
-# print(gles_korresp[grepl("Pol. Mediennutzun", gles_korresp$Variablenlabel),c("Variablenname", "Variablenlabel")])
+print(gles_korresp[grepl("Pol. Mediennutzun", gles_korresp$Variablenlabel),c("Variablenname", "Variablenlabel")])
 
+print(gles_korresp[grepl("Wahlabsicht", gles_korresp$Variablenlabel),c("Variablenname", "Variablenlabel")], n= 50)
 # colnames(gles_data)
 
-# info_source_data <- gles_data |> subset(select = c("field_start", "field_end", "sample", "version", "lfdn", "lfdn_od", "m0001_1", "m0001_2", "m0001_3")) # m0001_1 does not yet include social media, social media in there since 2012
+info_source_data <- gles_data |> subset(select = c("field_start", "field_end", "sample", "version", "lfdn", "lfdn_od", "m0001_1", "m0001_2", "m0001_3", "s0002", "e0003a_1", "e0003a_2", "e0003b_1", "e0003b_2")) # m0001_1 does not yet include social media, social media in there since 2012
 
 
 
@@ -46,22 +47,126 @@ Now, we have a first look at the data. Mainly interesting to us is the data that
 - how is the data distributed for the oldest and the latest year?
 - how did it develop over time?
 ```{r}
-# print(info_source_data$m0001_1[1:10])
-# print(info_source_data$m0001_2[1:10])
-# print(info_source_data$m0001_3[1:10])
+print(info_source_data$m0001_1[1:10])
+print(info_source_data$m0001_2[1:10])
+print(info_source_data$m0001_3[1:10])
 
-# info_source_data[info_source_data$m0001_3 %in% c(-99:-71), ] <- NA
+info_source_data[info_source_data$m0001_3 %in% c(-99:-71), ] <- NA
 
-# info_source_3 <- info_source_data[!is.na(info_source_data$m0001_3), ]
+info_source_3 <- info_source_data[!is.na(info_source_data$m0001_3), ]
+
+print(info_source_3$m0001_3[1:10])
+
+
+# pasting together columns for vote intention (e0003a_1 + e0003a_2 and e0003b_1 + e0003b_2) as they are mutually exclusive and should be merged to one column for better handling. The same applies to the field_start and field_end columns, which are merged to one column called time_period.)
+
+# 1. declaring -94 as missing value in both columns
+info_source_3$e0003a_1[info_source_3$e0003a_1 == -94] <- NA
+info_source_3$e0003a_2[info_source_3$e0003a_2 == -94] <- NA
+info_source_3$e0003b_1[info_source_3$e0003b_1 == -94] <- NA
+info_source_3$e0003b_2[info_source_3$e0003b_2 == -94] <- NA
+
+info_source_3 <- info_source_3 |> mutate(vote_intention_erststimme = str_remove(paste0(e0003a_1, e0003a_2), "NA"), vote_intention_zweitstimme = str_remove(paste0(e0003b_1, e0003b_2), "NA"))
+
+info_source_3 <- info_source_3 |> mutate(vote_intention_erststimme = case_when(
+  vote_intention_erststimme == "1" ~ "1",#"CDU/CSU",
+  vote_intention_erststimme == "4" ~ "2",#"SPD",
+  vote_intention_erststimme == "322" ~ "3",#"AfD",
+  vote_intention_erststimme == "5" ~ "4",#"FDP",
+  vote_intention_erststimme == "6" ~ "5",#"Bündnis 90/Die Grünen",
+  vote_intention_erststimme == "7" ~ "6",#"Die Linke",
+  TRUE ~ NA_character_
+))
+# recode to have vote intention other parties are all values larger than 7
+info_source_3$vote_intention_erststimme[!is.na(info_source_3$vote_intention_erststimme) & info_source_3$vote_intention_erststimme > 7] <- 7
+
+
+# recode vote intention columns to factors with the correct labels
+info_source_3$vote_intention_erststimme <- factor(info_source_3$vote_intention_erststimme,
+  levels = c("1", "2", "3", "4", "5", "6", "7"),
+  labels = c("CDU/CSU", "SPD", "FDP", "Bündnis 90/Die Grünen", "Die Linke", "AfD", "Other parties")
+)
+
+# Now the same for Zweitstimme
+
+info_source_3 <- info_source_3 |> mutate(vote_intention_zweitstimme = str_remove(paste0(e0003a_1, e0003a_2), "NA"), vote_intention_zweitstimme = str_remove(paste0(e0003b_1, e0003b_2), "NA"))
+
+info_source_3 <- info_source_3 |> mutate(vote_intention_zweitstimme = case_when(
+  vote_intention_zweitstimme == "1" ~ "1",#"CDU/CSU",
+  vote_intention_zweitstimme == "4" ~ "2",#"SPD",
+  vote_intention_zweitstimme == "322" ~ "3",#"AfD",
+  vote_intention_zweitstimme == "5" ~ "4",#"FDP",
+  vote_intention_zweitstimme == "6" ~ "5",#"Bündnis 90/Die Grünen",
+  vote_intention_zweitstimme == "7" ~ "6",#"Die Linke",
+  TRUE ~ NA_character_
+))
+# recode to have vote intention other parties are all values larger than 7
+info_source_3$vote_intention_zweitstimme[!is.na(info_source_3$vote_intention_zweitstimme) & info_source_3$vote_intention_zweitstimme > 7] <- 7
+
+
+# recode vote intention columns to factors with the correct labels
+info_source_3$vote_intention_zweitstimme <- factor(info_source_3$vote_intention_zweitstimme,
+  levels = c("1", "2", "3", "4", "5", "6", "7"),
+  labels = c("CDU/CSU", "SPD", "FDP", "Bündnis 90/Die Grünen", "Die Linke", "AfD", "Other parties")
+)
+
+
+
+head(info_source_3[, c("e0003a_1", "e0003a_2", "vote_intention_erststimme", "e0003b_1", "e0003b_2", "vote_intention_zweitstimme")])
+# renaming columns for better handling
+colnames(info_source_3)[colnames(info_source_3) == "m0001_3"] <- "media_info_source"
+colnames(info_source_3)[colnames(info_source_3) == "s0002"] <- "birth_year"
+
+# save subset of relevant columns
+info_source_3 <- info_source_3[, c("field_start", "field_end", "sample", "version", "lfdn", "lfdn_od", "media_info_source", "birth_year", "vote_intention_erststimme", "vote_intention_zweitstimme")]
+
+
+
+info_source_3 <- info_source_3 |> mutate(
+    birth_year = as.integer(str_extract(birth_year, "\\d{4}")),
+    age        = as.integer(str_extract(field_start, "\\d{4}")) - birth_year,
+    age_group  = case_when(
+      age <= 29 ~ "18-29",
+      age >= 30 & age <= 39 ~ "30-39",
+      age >= 40 & age <= 49 ~ "40-49",
+      age >= 50             ~ "50+",
+      TRUE                  ~ NA_character_
+    ),
+    time_period = as.Date(field_start))
+
+# recode media_info_source so that other internet providers are recoded to other (7)
+
+info_source_3$media_info_source[info_source_3$media_info_source == 5] <- 7#"Other Internetproviders"
+info_source_3$media_info_source[info_source_3$media_info_source == 6] <- 5#"Personal 
+info_source_3$media_info_source[info_source_3$media_info_source == 7] <- 6#"Personal 
+
+info_source_3 <- info_source_3 |> mutate(
+    media_info_source = factor(media_info_source,
+      levels = 1:6,
+      labels = c(
+        "TV",
+        "Newspaper",
+        "Radio",
+        "Social media",
+        "Personal conversation",
+        "Other source"
+      )
+    )
+)
+
+unique(info_source_3$media_info_source)
+
+
 
 # write.csv(info_source_3, "data/sm_relevance.csv")
+saveRDS(info_source_3, "data/sm_relevance.rds")
 
 # From when on is social media included?
 
-# min(info_source_3$field_start)
-# unique(info_source_3$field_start)
-# length(unique(info_source_3$lfdn_od))
-# nrow(info_source_3)
+min(info_source_3$field_start)
+unique(info_source_3$field_start)
+length(unique(info_source_3$lfdn_od))
+nrow(info_source_3)
 
 # info_source_3[info_source_3$lfdn_od == 30, ]
 # # --> the respondent id is lfdn_od
