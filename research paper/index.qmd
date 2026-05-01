@@ -6,7 +6,9 @@ authors:
     roles: writing
     corresponding: true
 bibliography: references.bib
-format: pdf
+format:
+  pdf:
+    df-print: kable
 ---
 
 ```{r}
@@ -212,16 +214,56 @@ Check in how many speeches the word gendern occurs across parties in the Bundest
 
 ```{r}
 # summary table key variables
-keyvars <- data.frame("Variable" = c("Populist dimension", "Populist dimension", "Populist dimension", "Populist dimension", "Topic", "Party Affiliation", "Speaker", "Time"),
-"Type" = c("Ratio", "Ratio", "Ratio", "Ratio", "Ratio", "Nominal", "Nominal", "Interval"),
-"Operationalisation" = c("Anti-Elitism", "People-Centrism", "Left-Wing Host-Ideology", "Right-Wing Host-Ideology", "Topic proportions", "Speaker party", "Speaker name", "monthly intervals (Oct 2021 - Apr 2023)")) #TODO explain why time is continuous (change over time is expected to be linear and not bound by events)
+keyvars <- data.frame("Variable" = c("Populist dimension", "Populist dimension", "Populist dimension", "Populist dimension", "relevance of social media", "Topic", "Party Affiliation", "Speaker", "Time"),
+"Type" = c("Ratio", "Ratio", "Ratio", "Ratio", "Ratio", "Ratio", "Interval", "Nominal", "Nominal"),
+"Operationalisation" = c("Anti-Elitism", "People-Centrism", "Left-Wing Host-Ideology", "Right-Wing Host-Ideology", "Share of respondents choosing social media as most importan political information medium", "Topic proportions", "monthly intervals (Oct 2021 - Apr 2023)", "Speaker party", "Speaker name"),
+"Theoretical function" = c("Dependent variable", "Dependent variable", "Dependent variable", "Dependent variable", "Independent variable", "Independent variable", "Independent variable", "Control variable", "Control variable")) #TODO explain why time is continuous (change over time is expected to be linear and not bound by events)
 
-print(keyvars)
+
+# Disclaimer: following code was created by perplexity
+library(knitr)
+library(kableExtra)
+library(dplyr)
+
+keyvars |>
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    longtable = FALSE,
+    align = c("l", "l", "l", "l"),
+    caption = "Overview of key variables, their measurement, and theoretical roles",
+    escape = FALSE
+  ) |>
+  kable_styling(
+    latex_options = c("hold_position", "scale_down"),
+    font_size = 9,
+    full_width = FALSE
+  ) |>
+  column_spec(1, width = "3.5cm") %>%
+  column_spec(2, width = "2cm") %>%
+  column_spec(3, width = "8cm") %>%
+  column_spec(4, width = "4cm") %>%
+  row_spec(0, bold = TRUE)  # Bold headers
+
 
 ```
 
 # Results and Discussion
 
+Of all 44501 sentences classified by PopBERT, XX% contian anti-elitism, XX% contain people-centrism, XX% have a left-wing host ideology and XX% have a right-wing host ideology.
+
+Over time, the populist sentiment during the 20th period of the German Bundestag increased in the dimensions XXX and decreased in the dimension.
+
+
+## Rhetoric in the Bundestag VS Rhetoric on Social media
+
+@mersmann_digitization_2026 have applied topic modelling to a corpus of social media posts of political parties and politicians and measured the performance of those posts. When modelling similar topics on the Bundestag speech corpus and measuring the level of populist rhetoric per topic, some parallels emerge. Social media postings that address emotional topics such as immigration policy, security issues, and climate change perform best (@mersmann_digitization_2026). These are also the topics that experience high levels of populist rhetoric in parliamentary debates, both on the anti-elitism and the people-centrism scales. Right wing populism is more/less prevalent than left wing populism.
+
+```{r}
+
+# Graph on average populist sentiment per dimension over time faceted by party affiliation
+bt_speeches <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/bt_speeches.rds")
+```
 
 
 
@@ -235,12 +277,15 @@ TODO: interesting to check Die Linke since they split into Linke and BSW.
 
 ## Limitations
 
+There are several limitations to the conclusions reached in this paper. The most obvious and important one is that no reliable statistical test has been conducted to test for a relation between the main independent variable "relevance of social media" and the dependent variable "Populist sentiment in parliamentary speeches". The results of multiple linear regressions can be found  
+
+
 The level of populism is evaluated by PopBERT on sentence instead of speech level. This poses two possible problems:
 
 First, the available data from SpeakGer comes on speech level. Splitting the speeches into sentences may wrongly split sentences at spots where they should not be split and vice versa. Parliamentary often are no cleanly written texts. During a speech there might be interventions or slips of the tongue that lead to difficulties in determining the end and beginning of sentences.
 Second, classifying on speech level would prevent missing any context information. Speech-level analysis focuses on the sentiment expressed throughout the whole text, whereas sentence-level analysis is normally employed when concentrating on short messages [@aliyu_comparative_2024]. Two sentences on their own might not be enough to identify populist rhetoric, but when they are taken together, they might prove to be populist.
 
-However, the PopBERT is limited to 512 tokens per classification, which would require chunking speeches to avoid truncating them. This would keep more context information but the chunk might split mid-sentence which would cause again loss of information. Therefore, this work relied on classifying at sentence level, which is closest to the method used by @erhard_popbert_2025. For future research, it might be valuable to employ more resource intesive approach to enable classifying on speech instead of sentence level. 
+However, the PopBERT is limited to 512 tokens per classification, which would require chunking speeches to avoid truncating them. This would keep more context information but the chunk might split mid-sentence which would cause again loss of information. Therefore, this work relied on classifying at sentence level, which is closest to the method used by @erhard_popbert_2025. For future research, it might be valuable to employ more resource intesive approach to enable classifying on speech instead of sentence level.
 
 Robustness checks for the transformer model have not been sufficiently conducted. It relies on the robustnesschecks of @erhard_popbert_2025 which have been conducted on data of the same institution in the same context but is older data. It is therefore not ensured that it performs the same on data that is more recent. This is problematic because this work explicitly aims to examine how populist rhetoric changes over time. Using a model trained on speeches from an earlier time period might reduce its performance (TODO: what metrics may be reduced?). However, using the same model ensures that any differences identified do not come from any differences in the transformer model. 
 
