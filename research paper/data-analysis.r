@@ -422,3 +422,16 @@ most_populist_speakers <- bt_speeches[bt_speeches$mean_pop_per_speaker == max(bt
 
 View(most_populist_speakers)
 
+
+
+# regression analysis with dv = populist_mean, iv = relevance_sm, control for party_affiliation, speaker_fixed_effects
+
+topic_proportions_base <- readRDS("data/topic_proportions_digitization.rds")
+topic_weighted <- readRDS("data/topic_populism_soft_weighted_digitization.rds")
+topic_proportions <- topic_proportions_base$merged
+
+p <- ggplot(topic_proportions, aes(x=top_topic, y=populist_mean)) +
+  geom_point()
+
+ggsave(p, filename = "plot_populism_by_topic.png", width = 10, height = 6, dpi = 150)
+

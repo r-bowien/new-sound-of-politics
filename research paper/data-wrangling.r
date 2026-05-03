@@ -193,6 +193,9 @@ nrow(info_source_3)
 bt_speeches_dat <- read.csv("data/Bundestag.csv")
 bt_speeches <- bt_speeches_dat[bt_speeches_dat$Period >= 20,]
 
+# bt_speeches_dat[bt_speeches_dat$MPID == 17826 & bt_speeches_dat$Date == "2022-10-13",]
+
+
 # bt_speeches_test <- bt_speeches |> sample_n(1000)
 # write.csv(x=bt_speeches_test, "data/Bundestag_testset.csv")
 # bt_speeches <- read.csv("data/bundestag_181920.csv")
@@ -214,8 +217,6 @@ bt_speeches_nochair <-  bt_speeches_meta[bt_speeches_meta$Chair == "False", ]
 
 bt_speeches_nointerjections <- bt_speeches_nochair[bt_speeches_nochair$Interjection == "False", ]
 bt_speeches_nointerjections[, c("Session", "Date", "Interjection", "MPID", "Party", "speech_id")] |> head()
-
-
 
 
 
@@ -241,8 +242,6 @@ names_bt_members_rgx <- sapply(names_bt_members, function(names){
 })
 
 
-
-
 # Disclaimer: following regex written by author
 remove_regex_base = "(\\d{4} )?Deutscher Bundestag – \\d{2} ?. Wahlperiode – \\d+ ?. Sitzung ?. Berlin, ((Mon|Diens|Donners|Frei|Sams|Sonn)tag|Mittwoch), den \\d+ ?. (Januar|Februar|M(ä|ae)rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember) \\d{4,}( \\d*)?"
 
@@ -262,9 +261,6 @@ lookaround_regexes_rm_names_b4 = sapply(names_bt_members_rgx, function(regex) {p
 lookaround_regexes_rm_names_bhind = sapply(names_bt_members_rgx, function(regex) {paste0("(?:", "(?:(?:\\d{2,4} )?Deutscher Bundestag – \\d{2} ?. Wahlperiode – \\d+ ?. Sitzung ?. Berlin, (?:(?:Mon|Diens|Donners|Frei|Sams|Sonn)tag|Mittwoch), den \\d+ ?. (?:Januar|Februar|M(?:ä|ae)rz|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember) \\d{4,}(?: \\d*)?) (?:Alterspr(?:ä|ae)sident|Parl\\. Staatssekret(?:ä|ae)r)? ?(?:\\w{2,4}\\. ){0,2}) ?(Alterspr(ä|ae)sident|Parl. Staatssekret(ä|ae)r)? ?(\\w{2,4}\\. ){0,2}(", regex,")")})
 
 bt_speeches_combined_clean <- bt_speeches_combined
-
-
-
 
 
 
@@ -289,14 +285,7 @@ bt_speeches_combined_clean$Speech <- removeRegexes(bt_speeches_combined_clean$Sp
 
 
 
-
-
-
 bt_speeches_combined_clean |> head()
-
-
-
-
 
 
 write.csv(bt_speeches_combined_clean, "data/bundestag_cleaned_period20.csv")
@@ -318,4 +307,16 @@ max(bt_speeches_combined_clean$Date)
 
 # speeches from 2013-10-22 to 2023-04-26
 
+# combine data from topic modelling, social media relevance and cleaned speeches for analysis.
+# The dataframe includes following variables:
+# - populist dimensions (anti-elitism, people-centrism, left-wing host-ideology, right-wing host-ideology)
+# - relevance of social media as political information source (from GLES) not in the df because not in regression, insted use time
+# - topic proportions for the topics identified in the topic modelling step
+# - party affiliation of the speaker
+# - speaker name
+# - time (monthly intervals from Oct 2021 to Apr 2023)
+
+# topic_proportions <- readRDS("data/topic_proportions_digitization.rds")
+# # bt_speeches <- readRDS("data/bt_speeches.rds")
+# sm_relevance <- readRDS("data/sm_relevance.rds")
 

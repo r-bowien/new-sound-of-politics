@@ -113,7 +113,8 @@ toks <- tokens_compound(
     "erneuerbare energie",
     "erneuerbare energien",
     "erneuerbaren energien",
-    "soziale gerechtigkeit"
+    "soziale gerechtigkeit",
+    "hartz iv"
   ))
 )
 
@@ -123,7 +124,7 @@ toks <- toks |> tokens_remove(c("wer_stimmt_dagegen", "wer_stimmt_dafür", "wer_
 
 
 dfm <- dfm(toks)
-dfm_trim <- dfm_trim(dfm, min_docfreq = 2, min_termfreq = 5)
+dfm_trim <- dfm_trim(dfm, min_docfreq = 2, min_termfreq = 2)
 dfm_trim_clean <- dfm_subset(dfm_trim, ntoken(dfm_trim) > 0)
 keyatm_obj <- keyATM_read(dfm_trim_clean)
 
@@ -243,13 +244,13 @@ return(list(hard = topic_populism, soft = topic_populism_soft_weighted))
 
 # disclaimer: github copilot generated most of the keywords for the topic analysis, the user adjusted where necessary.
 topics_digitization = list(
-              agriculture = c("feld", "landwirtschaft", "bauern", "nahrungsmittel"),
+              agriculture = c("feld", "landwirtschaft", "bauern", "nahrungsmittel", "lebensmittel"),
               culturemedia = c("kultur", "feiern", "medien", "fernsehen", "radio", "zeitungen"),
               digitalizationtech = c("internet", "digital", "online", "netz", "plattform", "digitalisierung"),
               economy = c("arbeit", "unternehmen", "wirtschaft", "job", "arbeitsplätze", "lohn", "industrie"),
               eudcationscience = c("schule", "bildung", "universität", "forschung", "wissenschaft", "lehrer"),
               environmentclimate = c("klima", "umwelt", "energie", "klimaschutz", "klimawandel", "erneuerbare", "erneuerbare_energien", "erneuerbaren_energien"),
-              financetax = c("finanz", "geld", "haushalt", "schulden", "etat"),
+              financetax = c("finanz", "geld", "haushalt", "schulden", "etat", "steuern", "steuer"),
               foreign = c("ausland", "international", "europäisch", "diplomatie", "nato", "china", "amerika", "usa"),
               government = c("regierung", "bundesregierung", "kanzler", "minister", "bundestag", "parlament"),
               party = c("partei", "parteien", "fraktion", "abgeordnete", "mitglied", "wahl", "wahlkampf", "cdu", "csu", "spd", "bündnis_90_grünen", "linke", "afd", "fdp"),
@@ -264,12 +265,11 @@ topics_digitization = list(
               )
 
 
-
 topics_local <- list(
               procedural = c("tagesordnung", "ergebnis", "antrag", "gesetz", "debatte", "drucksache", "präsident", "präsidentin", "ausschuss", "rede", "plenum", "wort", "zwischenfrage", "intervention", "protokoll"),
               covid = c("corona", "covid", "pandemie", "impfung", "virus", "infektion", "gesundheitsschutz"),
               migration = c("migration", "flüchtlinge", "asyl", "integration", "grenzen", "integration"),
-              social = c("soziale_gerechtigkeit", "sozial", "rente", "arbeitslosigkeit", "familie"),
+              social = c("soziale_gerechtigkeit", "sozial", "rente", "arbeitslosigkeit", "familie", "hartz_iv", "grundsicherung", "bürgergeld"),
               economy = c("arbeit", "unternehmen", "wirtschaft", "job", "arbeitsplätze", "lohn", "industrie"),
               eudcationscience = c("schule", "bildung", "universität", "forschung", "wissenschaft", "lehrer"),
               environmentclimate = c("klima", "umwelt", "energie", "klimaschutz", "klimawandel", "erneuerbare", "erneuerbare_energien", "erneuerbaren_energien"),
@@ -298,11 +298,7 @@ keyatm_model_local <- keyATM(
   options = list(seed = 420)
 )
 
-
-
 top_words(keyatm_model_local, n=20)
-
-
 
 create_topic_df <- function(keyatm_model, base_dataframe) {
   
@@ -310,7 +306,7 @@ create_topic_df <- function(keyatm_model, base_dataframe) {
   # Extract theta as dataframe with doc_id
   topic_df <- as.data.frame(keyatm_model$theta)
   topic_df$doc_id <- seq_len(nrow(topic_df))
-  
+
   # Reshape sentiment dimensions to long format
   sentences_long <- base_dataframe |>
     pivot_longer(
@@ -354,7 +350,7 @@ create_topic_df <- function(keyatm_model, base_dataframe) {
     left_join(topic_df, by = "doc_id")
   
   # Compute top_topic using max.col (handles any # topics)
-  topic_cols <- grep("^[^T]", names(merged), value = TRUE)  # Non-doc_id columns starting topics
+  topic_cols <- grep("^(\\d+_|Other_)", names(merged), value = TRUE)  # Non-doc_id columns starting topics
   merged$top_topic <- max.col(merged[, topic_cols], ties.method = "first")
   
   # Optionally return summaries too
@@ -406,18 +402,21 @@ calculate_averages <- function(merged) {
   return(list(hard = topic_populism_hard, soft = topic_populism_soft))
 }
 
-
-
 merged_digitization <- create_topic_df(keyatm_model = keyatm_model_digitization, base_dataframe = bt_speeches)
 topic_populism_soft_weighted_digitization <- calculate_averages(merged_digitization$merged)
 
-merged_local <- create_topic_df(keyatm_model = keyatm_model_digitization, base_dataframe = bt_speeches)
-topic_populism_soft_weighted_local <- calculate_averages(merged_local$merged)
+# count how many missing values there are in top_topic
+merged_digitization$merged[is.na(merged_digitization$merged$top_topic),] |> View()
 
 
+saveRDS(merged_digitization, "data/topic_proportions_digitization.rds")
 saveRDS(topic_populism_soft_weighted_digitization, "data/topic_populism_soft_weighted_digitization.rds")
-saveRDS(topic_populism_soft_weighted_local, "data/topic_populism_soft_weighted_local.rds")
+
+
+# merged_local <- create_topic_df(keyatm_model = keyatm_model_digitization, base_dataframe = bt_speeches)
+# topic_populism_soft_weighted_local <- calculate_averages(merged_local$merged)
+
+# saveRDS(topic_populism_soft_weighted_local, "data/topic_populism_soft_weighted_local.rds")
 
 head(merged_digitization)
-head(merged_local)
 
