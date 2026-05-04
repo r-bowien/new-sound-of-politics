@@ -1,6 +1,6 @@
 ---
 title: The New Sound of Politics
-authors:
+author:
   - name: Robert Bowien
     affiliation: University College Dublin
     roles: writing
@@ -9,12 +9,25 @@ bibliography: references.bib
 format:
   pdf:
     df-print: kable
+manuscript: false
+execute:
+  echo: false
+  cache: false
 ---
 
 ```{r}
+#| label: setup
 library(ggplot2)
 library(dplyr)
 library(stringr)
+library(knitr)
+library(kableExtra)
+
+data_sm_relevance <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/sm_relevance.rds")
+bt_speeches <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/bt_speeches.rds")
+
+theme_set(theme_minimal())
+
 ```
 
 
@@ -71,17 +84,12 @@ Since it has become evident that politicians successfully utilise this lacking f
 
 Digital media has introduced a quick and intense change into how we think political information is consumed by the electorate. Consuming political online content can contribute to political participation [@kahne_political_2018; @boulianne_social_2015]. Political communication on social media seems to benefit right-wing parties more than left-wing parties [@mutascu_online_2025]. Political communication that employs populist rhetoric on social media differs across parties. Left-wing populists prefer attacks on the economic elite while right-wing populists predominantly attack the media elite and ostracise outgroups [@engesser_populism_2017].
 
-
-
 Social media performance plays an increasingly important role in parties communication strategies. Parties pay attention to the performance of their social media posts and the engagement with them and adjust their strategy accordingly [@ennser-jedenastik_does_2022]. Since social media proved to be an effective tool for influencing public opinion, political advisors have put more salience on social media [@lilleker_towards_2015]. It is therefore reasonable to assume that parties try to increase their social media reach, for example by using populist rhetoric in speech snippets from parliamentary bodies.
 
-
 ```{r}
-# data_sm_relevance <- read.csv("data/sm_relevance.csv")
-data_sm_relevance <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/sm_relevance.rds")
-```
-```{r}
-
+#| label: fig-1
+#| fig-width: 12
+#| fig-height: 8
 # Compute share of each source within age group x wave
 df_counts <- data_sm_relevance |>
   group_by(time_period, age_group, media_info_source) |>
@@ -108,13 +116,13 @@ source_palette <- setNames(source_palette$colour, source_palette$media)
  
 # Plot — faceted by age group, one line per source
 p1 <- ggplot(df_counts, aes(x = time_period, y = share, colour = media_info_source, group = media_info_source)) +
-  geom_line(linewidth = 0.9) +
+  geom_line() +
   geom_point(size = 2) +
   facet_wrap(~ age_group, ncol = 1) +
   scale_x_date(
     date_labels = "%b %Y",
-    date_breaks = "6 months",
-    expand = expansion(mult = 0.03)
+    date_breaks = "6 months"
+    # expand = expansion(mult = 0.03)
   ) +
   scale_y_continuous(
     labels = scales::percent_format(accuracy = 1),
@@ -126,17 +134,15 @@ p1 <- ggplot(df_counts, aes(x = time_period, y = share, colour = media_info_sour
     subtitle = "Share of respondents per source, split by age groups",
     x        = "Survey period (start)",
     y        = "Share"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title       = element_text(face = "bold", size = 14),
-    plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
-    legend.position  = "right",
-    axis.text.x      = element_text(angle = 30, hjust = 1),
-    panel.grid.minor = element_blank(),
-    strip.text       = element_text(face = "bold", size = 12)
-  )
- 
+  ) 
+  # theme(
+  #   plot.title       = element_text(face = "bold", size = 14),
+  #   plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
+  #   legend.position  = "right",
+  #   axis.text.x      = element_text(angle = 30, hjust = 1),
+  #   panel.grid.minor = element_blank(),
+  #   strip.text       = element_text(face = "bold", size = 12)
+  # )
 # Save
 # ggsave("plot_sources_by_agegroup.png", plot = p1, width = 11, height = 9, dpi = 150)
 p1
@@ -204,7 +210,9 @@ To understand the differences on how political topics are discussed in the Bunde
 
 
 ```{r}
-#| label: Summary of key variables
+#| label: tbl-results
+#| tbl-cap: "key variable table"
+
 keyvars <- data.frame("Variable" = c("Populist dimension", "Populist dimension", "Populist dimension", "Populist dimension", "relevance of social media", "Topic", "Party Affiliation", "Speaker", "Time"),
 "Type" = c("Ratio", "Ratio", "Ratio", "Ratio", "Ratio", "Ratio", "Interval", "Nominal", "Nominal"),
 "Operationalisation" = c("Anti-Elitism", "People-Centrism", "Left-Wing Host-Ideology", "Right-Wing Host-Ideology", "Share of respondents choosing social media as most importan political information medium", "Topic proportions", "monthly intervals (Oct 2021 - Apr 2023)", "Speaker party", "Speaker name"),
@@ -212,13 +220,10 @@ keyvars <- data.frame("Variable" = c("Populist dimension", "Populist dimension",
 
 
 # Disclaimer: following code was created by perplexity
-library(knitr)
-library(kableExtra)
-library(dplyr)
+
 
 keyvars |>
   kable(
-    format = "latex",
     booktabs = TRUE,
     longtable = FALSE,
     align = c("l", "l", "l", "l"),
@@ -253,8 +258,6 @@ Over time, the populist sentiment during the 20th period of the German Bundestag
 ```{r}
 
 # Graph on average populist sentiment per dimension over time faceted by party affiliation
-bt_speeches <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/bt_speeches.rds")
-
 
 
 ```
