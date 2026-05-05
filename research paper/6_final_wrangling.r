@@ -21,6 +21,7 @@ bibliography: references.bib
 library(ggplot2)
 library(dplyr)
 library(stringr)
+library(tidyr)
 
 
 
@@ -359,43 +360,38 @@ p2 <- ggplot(df_counts, aes(x = time_period, y = share, colour = media_info_sour
 ## Bundestag Speeches
 
 
-load the data
-
-
-bt_speeches <- read.csv("data/all_data_combined.csv")
-
-
-calculate summary statisitics
 
 
 
+bt_speeches <- readRDS("data/bt_speeches.rds")
 
-bt_speeches <- bt_speeches |> group_by(Party) |> mutate(n_party_members = length(unique(MPID)))
+bt_speeches <- bt_speeches |> mutate(Party = case_when(
+  Party == "afd" ~ "AfD",
+  Party == "cdu" ~ "CDU",
+  Party == "fdp" ~ "FDP",
+  Party == "spd" ~ "SPD",
+  Party == "die grünen" ~ "B90/Grüne",
+  Party == "linke/pds/sed" ~ "Linke",
+  grepl("fraktionslos", Party) ~ "fraktionslos"
+))
+
+bt_speeches_long <- bt_speeches |>
+  pivot_longer(
+    cols = c(Anti.Elitism, People.Centrism, Left.Wing.Host.Ideology, Right.Wing.Host.Ideology),
+    names_to  = "populist_dimension",
+    values_to = "score"
+  )
+bt_speeches_long$Date <- as.Date(bt_speeches_long$Date)
+
+
+
+saveRDS(bt_speeches_long, "data/bt_speeches_long.rds")
 
 sum_stat = subset(bt_speeches, select = c("Party", "n_party_members")) |> unique()
 
 print(sum_stat)
 print(bt_speeches[bt_speeches$n_party_members == max(bt_speeches$n_party_members),]$Party |> unique())
 
-
-
-# QTA methods
-
-
-bt_speeches|> head()
-
-
-
-
-
-# PopBERT evaluation
-
-
-bt_speeches <- bt_speeches |> mutate(populist_mean = (Anti.Elitism + People.Centrism + Left.Wing.Host.Ideology + Right.Wing.Host.Ideology)/4)
-
-bt_speeches <- bt_speeches |> mutate(Party = gsub("[^a-zA-Z0-9äöüß/ ]", "", Party))
-
-saveRDS(bt_speeches, "data/bt_speeches.rds")
 
 
 

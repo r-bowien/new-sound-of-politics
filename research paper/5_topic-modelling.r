@@ -11,7 +11,17 @@ library(quanteda)
 
 
 
-bt_speeches <- readRDS("data/bt_speeches.rds")
+
+bt_speeches <- read.csv("data/all_data_combined.csv")
+
+bt_speeches <- bt_speeches |> group_by(Party) |> mutate(n_party_members = length(unique(MPID)))
+
+bt_speeches <- bt_speeches |> mutate(populist_mean = (Anti.Elitism + People.Centrism + Left.Wing.Host.Ideology + Right.Wing.Host.Ideology)/4)
+
+bt_speeches <- bt_speeches |> mutate(Party = gsub("[^a-zA-Z0-9äöüß/ ]", "", Party))
+
+saveRDS(bt_speeches, "data/bt_speeches.rds")
+
 nrow(bt_speeches)
 bt_speeches$doc_id <- seq_len(nrow(bt_speeches))
 length(unique(bt_speeches$doc_id))

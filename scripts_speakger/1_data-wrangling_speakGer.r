@@ -1,13 +1,8 @@
 
----
-title: Data wrangling - The New Sound of Politics
-authors:
-  - name: Robert Bowien
-    affiliation: University College Dublin
-    roles: writing
-    corresponding: true
-bibliography: references.bib
----
+# title: Data wrangling - The New Sound of Politics
+# author: Robert Bowien
+# affiliation: University College Dublin
+
 
 # This document shows the data wrangling for the Project "The New Sound of Politics".
 
@@ -169,43 +164,18 @@ unique(info_source_3$field_start)
 length(unique(info_source_3$lfdn_od))
 nrow(info_source_3)
 
-# info_source_3[info_source_3$lfdn_od == 30, ]
-# # --> the respondent id is lfdn_od
-
-# data_hist_sample54 <- info_source_3[info_source_3$sample == 54, ]
-# data_hist_sample46 <- info_source_3[info_source_3$sample == 46, ]
-
-# hist(data_hist_sample46$m0001_3)
-# hist(data_hist_sample54$m0001_3)
-
-
-
-
-
-# We can observe a clear positive trend of the relevance of social media as a political information source.
-
 
 # Part 2: Bundestag speeches
 
-# Here, the speeches in the Bundestag are cleaned and filtered as good as possible. However, the structure and lack of tidyness of the data pose challenging problems, some of which could not be resolved to adhere to the highest scientific standards.
+# Here, the speeches in the Bundestag are cleaned and filtered as good as possible.
+# However, the structure and lack of tidyness of the data pose challenging problems, some of which could not be resolved to adhere to the highest scientific standards.
 
 
-bt_speeches_dat <- read.csv("data/Bundestag.csv")
-bt_speeches <- bt_speeches_dat[bt_speeches_dat$Period >= 20,]
+bt_speeches_dat_speakger <- read.csv("data/Bundestag.csv")
 
-# bt_speeches_dat[bt_speeches_dat$MPID == 17826 & bt_speeches_dat$Date == "2022-10-13",]
+bt_speeches <- bt_speeches_dat_speakger |> filter(Period == 20)
 
-
-# bt_speeches_test <- bt_speeches |> sample_n(1000)
-# write.csv(x=bt_speeches_test, "data/Bundestag_testset.csv")
-# bt_speeches <- read.csv("data/bundestag_181920.csv")
 bt_meta <- read.csv("data/all_mps_meta.csv", sep = ";")
-
-
-nrow(bt_speeches) |> print()
-
-
-
 
 bt_speeches$speech_id <- seq_len(nrow(bt_speeches))
 bt_speeches[, c("Session", "Date", "Interjection", "MPID", "Party", "speech_id")] |> head()
@@ -262,8 +232,6 @@ lookaround_regexes_rm_names_bhind = sapply(names_bt_members_rgx, function(regex)
 
 bt_speeches_combined_clean <- bt_speeches_combined
 
-
-
 removeRegexes <- function(column, regex, n_threads = 4){
   for (n in seq_along(regex)){
     rgx <- regex[n]
@@ -284,39 +252,4 @@ bt_speeches_combined_clean$Speech <- removeRegexes(bt_speeches_combined_clean$Sp
 bt_speeches_combined_clean$Speech <- removeRegexes(bt_speeches_combined_clean$Speech, remove_regex_base, 8)
 
 
-
-bt_speeches_combined_clean |> head()
-
-
 write.csv(bt_speeches_combined_clean, "data/bundestag_cleaned_period20.csv")
-bundestag_combined_clean <- read.csv("data/bundestag_cleaned_period20.csv")
-
-# The dataset bundestag_seit2020 contains 
-
-bundestag_combined_clean |> nrow()
-
-
-# speeches from 2020-01-15 to 2023-04-26
-
-# The dataset bundestag_181920 contains
-
-
-nrow(bt_speeches_combined_clean)
-min(bt_speeches_combined_clean$Date)
-max(bt_speeches_combined_clean$Date)
-
-# speeches from 2013-10-22 to 2023-04-26
-
-# combine data from topic modelling, social media relevance and cleaned speeches for analysis.
-# The dataframe includes following variables:
-# - populist dimensions (anti-elitism, people-centrism, left-wing host-ideology, right-wing host-ideology)
-# - relevance of social media as political information source (from GLES) not in the df because not in regression, insted use time
-# - topic proportions for the topics identified in the topic modelling step
-# - party affiliation of the speaker
-# - speaker name
-# - time (monthly intervals from Oct 2021 to Apr 2023)
-
-# topic_proportions <- readRDS("data/topic_proportions_digitization.rds")
-# # bt_speeches <- readRDS("data/bt_speeches.rds")
-# sm_relevance <- readRDS("data/sm_relevance.rds")
-
