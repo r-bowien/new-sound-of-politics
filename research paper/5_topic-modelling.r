@@ -1,6 +1,5 @@
 # Topic modelling of bundestag speeches of the 20th legislative period
 
-
 library(tidyr)
 library(dplyr)
 library(stringfish)
@@ -12,70 +11,53 @@ library(quanteda)
 
 
 
-bt_speeches <- read.csv("data/all_data_combined.csv")
 
-bt_speeches <- bt_speeches |> group_by(Party) |> mutate(n_party_members = length(unique(MPID)))
+# Speech-level data: original text from DIP API, used as keyATM documents
+bt_speeches_dpi <- read.csv("data/bt_speeches_dpi_api.csv")
+colnames(bt_speeches_dpi)[colnames(bt_speeches_dpi) == "topic"] <- "dpi_topic"
+bt_speeches_dpi$Date <- as.Date(bt_speeches_dpi$Date)
+bt_speeches_dpi <- bt_speeches_dpi |> mutate(Party = case_when(
+  Party == "BSW (Gruppe)"          ~ "BSW",
+  Party == "Die Linke (Gruppe)"    ~ "Die Linke",
+  Party == "BÜNDNIS 90/DIE GRÜNEN" ~ "B90/Die Grünen",
+  TRUE ~ Party
+))
 
-bt_speeches <- bt_speeches |> mutate(populist_mean = (Anti.Elitism + People.Centrism + Left.Wing.Host.Ideology + Right.Wing.Host.Ideology)/4)
+# Sentence-level data: PopBERT scores, joined back to speeches after topic modelling
+bt_sentences <- read.csv("scripts_not_render/all_data_combined.csv")
+bt_sentences <- bt_sentences |> filter(nchar(sentence) >= 10)
+bt_sentences <- bt_sentences |> group_by(Party) |> mutate(n_party_members = length(unique(Name)))
+bt_sentences <- bt_sentences |> mutate(
+  populist_mean = (Anti.Elitism + People.Centrism + Left.Wing.Host.Ideology + Right.Wing.Host.Ideology) / 4
+)
+colnames(bt_sentences)[colnames(bt_sentences) == "topic"] <- "dpi_topic"
+bt_sentences <- bt_sentences |> mutate(Party = case_when(
+  Party == "BSW (Gruppe)"          ~ "BSW",
+  Party == "Die Linke (Gruppe)"    ~ "Die Linke",
+  Party == "BÜNDNIS 90/DIE GRÜNEN" ~ "B90/Die Grünen",
+  TRUE ~ Party
+))
 
-bt_speeches <- bt_speeches |> mutate(Party = gsub("[^a-zA-Z0-9äöüß/ ]", "", Party))
+cat("Speeches:", nrow(bt_speeches_dpi), "| Sentences:", nrow(bt_sentences), "\n")
 
-saveRDS(bt_speeches, "data/bt_speeches.rds")
+# Corpus at speech level — speeches are the natural topical unit for keyATM.
+# bt_speeches_dpi$speech_id (sequential 1..N) is used as corpus docid.
+# bt_sentences$speech_id = Python's pandas index = bt_speeches_dpi$X (original R row names);
+# the join after topic modelling matches bt_sentences$speech_id against merged_speeches$X.
+bt_corpus <- corpus(bt_speeches_dpi, text_field = "Speech", docid_field = "speech_id")
 
-nrow(bt_speeches)
-bt_speeches$doc_id <- seq_len(nrow(bt_speeches))
-length(unique(bt_speeches$doc_id))
-names_bt_members_list <- unique(bt_speeches$Name) |> list()
-names_bt_members <- split(names_bt_members_list[[1]], ceiling(seq_along(names_bt_members_list[[1]])/300))
-
-
-names_bt_members_rgx <- sapply(names_bt_members, function(names){
-  gsub(" \\(.+\\)", "", paste0(names, collapse="|"))
-})
-
-
-removeRegexes <- function(column, regex, n_threads = 4){
-  for (n in seq_along(regex)){
-    rgx <- regex[n]
-    print(paste0("rgx group: ", n, " of ", length(regex)))
-    # Source - https://stackoverflow.com/a/78270004
-    # Posted by LMc
-    # Retrieved 2026-04-08, License - CC BY-SA 4.0
-    column <- sf_gsub(column, regex(rgx, ignore_case = TRUE), "", nthreads = n_threads)
-  
-  }
-  return(column)
-}
-
-bt_speeches$sentence <- removeRegexes(bt_speeches$sentence, names_bt_members_rgx)
-
-bt_corpus <- corpus(bt_speeches, text_field = "sentence", docid_field = "doc_id")
-
-
-# Source - https://stackoverflow.com/a/50843894
-# Posted by Ken Benoit
-# Retrieved 2026-04-29, License - CC BY-SA 4.0
-
-containstarget <- str_detect(bt_corpus, "Drucksachen")
-summary(containstarget)
-##    Mode   FALSE    TRUE 
-## logical    44393     108 
-
-# Source - https://stackoverflow.com/a/50843894
-# Posted by Ken Benoit
-# Retrieved 2026-04-29, License - CC BY-SA 4.0
-
-bt_corpus_trimmed <- corpus_subset(bt_corpus, !containstarget)
 
 toks <- tokens(
-  bt_corpus_trimmed,
+  bt_corpus,
   remove_punct = TRUE,
-  remove_numbers = FALSE, # some numbers could be relevant as they could refer to specific events (e.g. 100 billion for the Bundeswehr)
+  remove_numbers = TRUE,
   remove_symbols = FALSE
 ) |>
-  tokens_remove(c(stopwords("de"), "kolleginnen",
-  "kollegen", "frau", "herr", "damen", "herren", "geehrte", "geehrten", "liebe", "vielen", "dank", "mal", "geehrter", "dr", "dass", "verehrten", "verehrte", "herzlichen", "dank", "ja", "schon", "stimmen", "enthaltungen", "angenommen", "abstimmung", "gestimmt", "ungültige", "neinstimmen", "jastimmen"))
-
+  tokens_remove(c(stopwords("de"), "kolleginnen", "kollegen", "frau", "herr", "damen", "herren", "geehrte",
+  "geehrten", "liebe", "vielen", "dank", "mal", "geehrter", "dr", "dass", "verehrten", "verehrte", "herzlichen", "dank",
+  "ja", "schon", "stimmen", "enthaltungen", "angenommen", "abstimmung", "gestimmt", "ungültige", "neinstimmen", "jastimmen",
+  "gibt", "geht", "ganz", "immer", "dafür", "müssen", "brauchen", "heute", "gerade", "viele"))
+# überall: gibt mehr menschen müssen dafür immer ganz viel mehr brauchen
 
 
 
@@ -117,14 +99,28 @@ toks <- tokens_compound(
     "demokratischen parteien",
     "demokratischen fraktionen",
     "demokratische fraktionen",
-    "bürgerinnnen bürger",
+    "bürgerinnen bürger",
     "bürger innen",
     "zuschauer innen",
     "erneuerbare energie",
     "erneuerbare energien",
     "erneuerbaren energien",
     "soziale gerechtigkeit",
-    "hartz iv"
+    "hartz iv",
+    "milliarden euro",
+    "millionen euro",
+    "unserem land",
+    "kommen bitte schluss",
+    "soldatinnen soldaten",
+    "unseres landes",
+    "millionen menschen",
+    "unserer gesellschaft",
+    "olaf scholz",
+    "bundesrepublik deutschland",
+    "letzten jahren",
+    "seit jahren",
+    "letzten jahr",
+    "mehr geld"
   ))
 )
 
@@ -134,123 +130,9 @@ toks <- toks |> tokens_remove(c("wer_stimmt_dagegen", "wer_stimmt_dafür", "wer_
 
 
 dfm <- dfm(toks)
-dfm_trim <- dfm_trim(dfm, min_docfreq = 2, min_termfreq = 2)
+dfm_trim <- dfm_trim(dfm, min_docfreq = 25, min_termfreq = 35)
 dfm_trim_clean <- dfm_subset(dfm_trim, ntoken(dfm_trim) > 0)
 keyatm_obj <- keyATM_read(dfm_trim_clean)
-
-
-
-# keyatm_model_15 <- weightedLDA(
-#   docs = keyatm_obj,
-#   number_of_topics = 15,
-#   model = "base",
-#   options = list(seed = 420)
-# )
-
-# top_words(keyatm_model_15, n = 20)
-
-# create a dataframe that includes the topic probabilities for each document
-# disclaimer: this code was generated by perplexity and reviewed and turned into a function by the user.:
-
-
-create_topic_df_LDA <- function(keyatm_model, base_dataframe) {
-
-topic_df <- as.data.frame(keyatm_model$theta)
-topic_df$doc_id <- seq_len(nrow(topic_df))
-
-
-# 3) Reshape the 4 dimensions into long format
-sentences_long <- base_dataframe |>
-  pivot_longer(
-    cols = c(People.Centrism, Anti.Elitism, Left.Wing.Host.Ideology, Right.Wing.Host.Ideology),
-    names_to = "dimension",
-    values_to = "score"
-  )
-
-# 4) Join topic proportions
-merged <- sentences_long |>
-  left_join(topic_df, by = "doc_id")
-
-# 5) Compute topic-weighted averages for each dimension
-topic_dims_long <- merged |>
-  pivot_longer(
-    cols = starts_with("Topic_"),   # adjust if topic columns have different names
-    names_to = "topic",
-    values_to = "topic_prob"
-  )
-  
-topic_dim_summary <- topic_dims_long |>
-  group_by(topic, dimension) |>
-  summarise(
-    weighted_mean_score = sum(score * topic_prob, na.rm = TRUE) / sum(topic_prob, na.rm = TRUE),
-    mean_score = mean(score, na.rm = TRUE),
-    n = n(),
-    .groups = "drop"
-  )
-
-
-topic_dims_long %>%
-  group_by(topic) %>%
-  summarise(
-    total_topic_weight = sum(topic_prob, na.rm = TRUE),
-    mean_topic_prob = mean(topic_prob, na.rm = TRUE),
-    sd_topic_prob = sd(topic_prob, na.rm = TRUE)
-  )
-
-
-merged <- dplyr::left_join(bt_speeches, topic_df, by = "doc_id")
-
-merged$top_topic <- max.col(merged[, paste0("Topic_", 1:15)], ties.method = "first")
-
-return(merged)
-
-}
-
-calculate_averages_LDA <- function(merged) {
-topic_populism <- merged |>
-  dplyr::group_by(top_topic) |>
-  dplyr::summarise(
-    mean_people_centrism = mean(People.Centrism, na.rm = TRUE),
-    share_mean_people_centrism = mean(People.Centrism > 0, na.rm = TRUE),
-    
-    mean_anti_elitism = mean(Anti.Elitism, na.rm = TRUE),
-    share_mean_people_centrism = mean(Anti.Elitism > 0, na.rm = TRUE),
-    
-    mean_left_wing = mean(Left.Wing.Host.Ideology, na.rm = TRUE),
-    share_mean_people_centrism = mean(Left.Wing.Host.Ideology > 0, na.rm = TRUE),
-    
-    mean_right_wing = mean(Right.Wing.Host.Ideology, na.rm = TRUE),
-    share_mean_people_centrism = mean(Right.Wing.Host.Ideology > 0, na.rm = TRUE),
-
-    n = dplyr::n()
-  )
-
-long <- merged |>
-  pivot_longer(starts_with("Topic_"), names_to = "topic", values_to = "p_topic") |>
-  mutate(weighted_people_centrism = People.Centrism * p_topic,
-         weighted_anti_elitism = Anti.Elitism * p_topic,
-         weighted_left_wing = Left.Wing.Host.Ideology * p_topic,
-         weighted_right_wing = Right.Wing.Host.Ideology * p_topic)
-
-topic_populism_soft_weighted <- long |>
-  group_by(topic) |>
-  summarise(
-    weighted_mean_people_centrism = sum(weighted_people_centrism, na.rm = TRUE) / sum(p_topic, na.rm = TRUE),
-    
-    weighted_mean_anti_elitism = sum(weighted_anti_elitism, na.rm = TRUE) / sum(p_topic, na.rm = TRUE),
-    
-    weighted_mean_left_wing = sum(weighted_left_wing, na.rm = TRUE) / sum(p_topic, na.rm = TRUE),
-    
-    weighted_mean_right_wing = sum(weighted_right_wing, na.rm = TRUE) / sum(p_topic, na.rm = TRUE),
-    n = n()
-  )
-return(list(hard = topic_populism, soft = topic_populism_soft_weighted))
-}
-
-
-# merged <- create_topic_df(keyatm_model_15, bt_speeches)
-# topic_populism_soft_weighted <- calculate_averages(merged)
-
 
 # disclaimer: github copilot generated most of the keywords for the topic analysis, the user adjusted where necessary.
 topics_digitization = list(
@@ -262,7 +144,7 @@ topics_digitization = list(
               environmentclimate = c("klima", "umwelt", "energie", "klimaschutz", "klimawandel", "erneuerbare", "erneuerbare_energien", "erneuerbaren_energien"),
               financetax = c("finanz", "geld", "haushalt", "schulden", "etat", "steuern", "steuer"),
               foreign = c("ausland", "international", "europäisch", "diplomatie", "nato", "china", "amerika", "usa"),
-              government = c("regierung", "bundesregierung", "kanzler", "minister", "bundestag", "parlament"),
+              government = c("regierung", "bundesregierung", "kanzler", "minister", "bundestag", "parlament", "olaf_scholz"),
               party = c("partei", "parteien", "fraktion", "abgeordnete", "mitglied", "wahl", "wahlkampf", "cdu", "csu", "spd", "bündnis_90_grünen", "linke", "afd", "fdp"),
               regional = c("region", "länder", "bundesländer", "kommunen", "städte", "dörfer"),
               security = c("sicherheit", "polizei", "terrorismus", "kriminalität", "sicher"),
@@ -270,163 +152,83 @@ topics_digitization = list(
               transportinfrastructure = c("verkehr", "infrastruktur", "bahn", "auto", "flughafen", "brücken", "öffentlichen", "autobahn", "schiene", "fahrrad"),
               # additional topics not from the digitization paper
               migration = c("migration", "flüchtlinge", "asyl", "integration", "grenzen", "integrieren"),
-              ukraine = c("ukraine", "russland", "krieg", "putin", "angriffskrieg", "invasion", "militärische intervention", "drohnenkrieg", "hybride kriegsführung"),
-              procedural = c("tagesordnung", "ergebnis", "überweisungsvorschlag", "antrag", "gesetz", "debatte", "schriftführer", "schriftführerinnen", "drucksache", "präsident", "präsidentin", "ausschuss", "rede", "plenum", "wort", "zwischenfrage", "intervention", "protokoll", "tagesordnungspunkt", "beschlussempfehlung", "aussprache")
+              ukraine = c("ukraine", "russland", "krieg", "putin", "angriffskrieg", "invasion", "drohnenkrieg"),
+              procedural = c("tagesordnung", "ergebnis", "antrag", "gesetz", "debatte", "schriftführer", "schriftführerinnen", "drucksache", "präsident", "präsidentin", "ausschuss", "rede", "plenum", "wort", "zwischenfrage", "intervention", "protokoll", "tagesordnungspunkt", "beschlussempfehlung", "aussprache")
               )
 
+saveRDS(keyatm_obj, file = "data/keyatm_obj3.rds")
 
-topics_local <- list(
-              procedural = c("tagesordnung", "ergebnis", "antrag", "gesetz", "debatte", "drucksache", "präsident", "präsidentin", "ausschuss", "rede", "plenum", "wort", "zwischenfrage", "intervention", "protokoll"),
-              covid = c("corona", "covid", "pandemie", "impfung", "virus", "infektion", "gesundheitsschutz"),
-              migration = c("migration", "flüchtlinge", "asyl", "integration", "grenzen", "integration"),
-              social = c("soziale_gerechtigkeit", "sozial", "rente", "arbeitslosigkeit", "familie", "hartz_iv", "grundsicherung", "bürgergeld"),
-              economy = c("arbeit", "unternehmen", "wirtschaft", "job", "arbeitsplätze", "lohn", "industrie"),
-              eudcationscience = c("schule", "bildung", "universität", "forschung", "wissenschaft", "lehrer"),
-              environmentclimate = c("klima", "umwelt", "energie", "klimaschutz", "klimawandel", "erneuerbare", "erneuerbare_energien", "erneuerbaren_energien"),
-              financetax = c("finanz", "geld", "haushalt", "schulden", "etat"),
-              foreign = c("ausland", "europa", "international", "europäisch", "diplomatie", "nato", "krieg", "ukraine", "russland", "china", "amerika", "usa", "putin"),
-              government = c("regierung", "bundesregierung", "kanzler", "minister", "bundestag", "parlament"),
-              security = c("sicherheit", "polizei", "verfassungsschutz", "terrorismus", "kriminalität")
-
-)
-
-keyatm_model_digitization <- keyATM(
-  keyatm_obj,
-  model = "base",
-  no_keyword_topics = 2,
-  keywords = topics_digitization,
-  options = list(seed = 420)
-)
+model_path <- "data/keyatm_model_digitization3.rds"
+if (file.exists(model_path)) {
+  keyatm_model_digitization <- readRDS(model_path)
+} else {
+  keyatm_model_digitization <- keyATM(
+    keyatm_obj,
+    model = "base",
+    no_keyword_topics = 2,
+    keywords = topics_digitization,
+    options = list(seed = 420)
+  )
+  saveRDS(keyatm_model_digitization, model_path)
+}
 
 top_words(keyatm_model_digitization, n=20)
 
-keyatm_model_local <- keyATM(
-  keyatm_obj,
-  model = "base",
-  no_keyword_topics = 2,
-  keywords = topics_local,
-  options = list(seed = 420)
+
+# Disclaimer: following code was partly created by Claude Sonnet 4.6 through iterations of prompting
+
+create_topic_df <- function(keyatm_model, bt_speeches_dpi, bt_sentences) {
+  # rownames of theta are speech_ids of the speeches that survived DFM trimming
+  topic_df <- as.data.frame(keyatm_model$theta)
+  topic_df$speech_id <- as.integer(rownames(keyatm_model$theta))
+
+  # Attach topic proportions to speech-level data and derive top_topic
+  merged_speeches <- bt_speeches_dpi |>
+    left_join(topic_df, by = "speech_id")
+  topic_cols <- grep("^(\\d+_|Other_)", names(merged_speeches), value = TRUE)
+  has_topics <- rowSums(!is.na(merged_speeches[, topic_cols])) > 0
+  merged_speeches$top_topic <- NA_integer_
+  merged_speeches$top_topic[has_topics] <- max.col(
+    merged_speeches[has_topics, topic_cols], ties.method = "first"
+  )
+  merged_speeches$top_topic_name <- NA_character_
+  merged_speeches$top_topic_name[has_topics] <- topic_cols[merged_speeches$top_topic[has_topics]]
+
+  # Propagate speech-level topic columns to sentence level.
+  # bt_sentences$speech_id = Python's idx (the unnamed R row-index "X" column).
+  # merged_speeches$X carries those same values, so join on X from the right side.
+  speech_join_cols <- c("X", topic_cols, "top_topic", "top_topic_name")
+  merged_sentences <- bt_sentences |>
+    left_join(merged_speeches[, speech_join_cols], by = c("speech_id" = "X"))
+
+  return(list(merged_sentences = merged_sentences, merged_speeches = merged_speeches))
+}
+
+merged_digitization <- create_topic_df(
+  keyatm_model    = keyatm_model_digitization,
+  bt_speeches_dpi = bt_speeches_dpi,
+  bt_sentences    = bt_sentences
 )
 
-top_words(keyatm_model_local, n=20)
+cat("Sentences with missing top_topic:", sum(is.na(merged_digitization$merged_sentences$top_topic)), "\n")
 
-create_topic_df <- function(keyatm_model, base_dataframe) {
-  
-  
-  # Extract theta as dataframe with doc_id
-  topic_df <- as.data.frame(keyatm_model$theta)
-  topic_df$doc_id <- seq_len(nrow(topic_df))
+saveRDS(merged_digitization, "data/topic_proportions_dpi3.rds")
 
-  # Reshape sentiment dimensions to long format
-  sentences_long <- base_dataframe |>
-    pivot_longer(
-      cols = c(People.Centrism, Anti.Elitism, Left.Wing.Host.Ideology, Right.Wing.Host.Ideology),
-      names_to = "dimension",
-      values_to = "score"
-    )
-  
-  # Join with topic proportions
-  merged_long <- sentences_long |>
-    left_join(topic_df, by = "doc_id") |>
-    pivot_longer(
-      cols = -c(names(sentences_long)),  # All topic columns
-      names_to = "topic",
-      values_to = "topic_prob"
-    )
+# Disclaimer: following Code was created by Claude Sonnet 4.6
+# Prompt: "Here you find the code for my topic modelling. At the bottom is the start of a keyness analysis. Adjust the last part of the code so that the keyness analysis is split by party. Also save the result so that I can load it and easily create a keyness plot after loading the result in another file."
+# --- Keyness analysis split by party ---
+# For each party, compute keyness of that party's documents vs. all others.
+# Uses the full (untrimmed) dfm so no documents are silently dropped.
 
+# party_var aligned to speech-level DFM (docnames are speech_ids as strings)
+speech_party_lookup <- setNames(bt_speeches_dpi$Party, as.character(bt_speeches_dpi$speech_id))
+party_var <- speech_party_lookup[docnames(dfm)]
 
-  # Compute topic-weighted averages per dimension
-  topic_dim_summary <- merged_long |>
-    group_by(topic, dimension) |>
-    summarise(
-      weighted_mean_score = sum(score * topic_prob, na.rm = TRUE) / sum(topic_prob, na.rm = TRUE),
-      mean_score = mean(score, na.rm = TRUE),
-      n = n(),
-      .groups = "drop"
-    )
-  
-  # Topic diagnostics
-  topic_diag <- merged_long |>
-    group_by(topic) |>
-    summarise(
-      total_topic_weight = sum(topic_prob, na.rm = TRUE),
-      mean_topic_prob = mean(topic_prob, na.rm = TRUE),
-      sd_topic_prob = sd(topic_prob, na.rm = TRUE),
-      .groups = "drop"
-    )
-  
-  # Main merged df for documents (wide topic format)
-  merged <- base_dataframe |>
-    left_join(topic_df, by = "doc_id")
-  
-  # Compute top_topic using max.col (handles any # topics)
-  topic_cols <- grep("^(\\d+_|Other_)", names(merged), value = TRUE)  # Non-doc_id columns starting topics
-  merged$top_topic <- max.col(merged[, topic_cols], ties.method = "first")
-  
-  # Optionally return summaries too
-  return(list(merged = merged, topic_dim_summary = topic_dim_summary, topic_diag = topic_diag))
-}
+parties <- unique(party_var[!is.na(party_var)])
 
-calculate_averages <- function(merged) {
-  # Unweighted (hard-clustering) averages by top_topic
-  topic_populism_hard <- merged |>
-    group_by(top_topic) |>
-    summarise(
-      mean_people_centrism = mean(People.Centrism, na.rm = TRUE),
-      share_people_centrism = mean(People.Centrism > 0, na.rm = TRUE),
-      mean_anti_elitism = mean(Anti.Elitism, na.rm = TRUE),
-      share_anti_elitism = mean(Anti.Elitism > 0, na.rm = TRUE),
-      mean_left_wing = mean(Left.Wing.Host.Ideology, na.rm = TRUE),
-      share_left_wing = mean(Left.Wing.Host.Ideology > 0, na.rm = TRUE),
-      mean_right_wing = mean(Right.Wing.Host.Ideology, na.rm = TRUE),
-      share_right_wing = mean(Right.Wing.Host.Ideology > 0, na.rm = TRUE),
-      n = n(),
-      .groups = "drop"
-    )
-  
-  # Weighted (soft) averages
-  long <- merged |>
-    pivot_longer(
-      cols = c(starts_with(c("1_", "2_", "3_", "4_", "5_", "6_", "7_", "8_", "9_", "10_", "11_", "12_", "13_", "14_", "15_", "Other_"))),  # Adjust if topic columns have different names
-      names_to = "topic",
-      values_to = "p_topic"
-    ) |>
-    mutate(
-      weighted_people_centrism = People.Centrism * p_topic,
-      weighted_anti_elitism = Anti.Elitism * p_topic,
-      weighted_left_wing = `Left.Wing.Host.Ideology` * p_topic,
-      weighted_right_wing = `Right.Wing.Host.Ideology` * p_topic
-    )
-  
-  topic_populism_soft <- long |>
-    group_by(topic) |>
-    summarise(
-      weighted_mean_people_centrism = sum(weighted_people_centrism, na.rm = TRUE) / sum(p_topic, na.rm = TRUE),
-      weighted_mean_anti_elitism = sum(weighted_anti_elitism, na.rm = TRUE) / sum(p_topic, na.rm = TRUE),
-      weighted_mean_left_wing = sum(weighted_left_wing, na.rm = TRUE) / sum(p_topic, na.rm = TRUE),
-      weighted_mean_right_wing = sum(weighted_right_wing, na.rm = TRUE) / sum(p_topic, na.rm = TRUE),
-      n = n(),
-      .groups = "drop"
-    )
-  
-  return(list(hard = topic_populism_hard, soft = topic_populism_soft))
-}
+keyness_by_party <- lapply(setNames(parties, parties), function(p) {
+  target_docs <- which(party_var == p)
+  textstat_keyness(dfm, target = target_docs)
+})
 
-merged_digitization <- create_topic_df(keyatm_model = keyatm_model_digitization, base_dataframe = bt_speeches)
-topic_populism_soft_weighted_digitization <- calculate_averages(merged_digitization$merged)
-
-# count how many missing values there are in top_topic
-merged_digitization$merged[is.na(merged_digitization$merged$top_topic),] |> View()
-
-
-saveRDS(merged_digitization, "data/topic_proportions_digitization.rds")
-saveRDS(topic_populism_soft_weighted_digitization, "data/topic_populism_soft_weighted_digitization.rds")
-
-
-# merged_local <- create_topic_df(keyatm_model = keyatm_model_digitization, base_dataframe = bt_speeches)
-# topic_populism_soft_weighted_local <- calculate_averages(merged_local$merged)
-
-# saveRDS(topic_populism_soft_weighted_local, "data/topic_populism_soft_weighted_local.rds")
-
-head(merged_digitization)
-
+saveRDS(keyness_by_party, "data/keyness_by_party3.rds")

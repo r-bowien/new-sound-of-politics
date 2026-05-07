@@ -1,433 +1,135 @@
----
-title: data analysis - The New Sound of Politics
-authors:
-  - name: Robert Bowien
-    affiliation: University College Dublin
-    roles: writing
-    corresponding: true
-bibliography: references.bib
----
-
-
-
-# Descriptive Data analysis
-
-## Social Media relevance
-
-# The next step is to calculate the proportion of social media as most important information source and then plot the development over time.
-
-
-
-library(ggplot2)
 library(dplyr)
-library(stringr)
 library(tidyr)
+library(stringr)
+library(haven)
+library(sandwich)
 
+# --- GLES survey data wrangling ---
+gles_data <- haven::read_dta("data/ZA6832_v2-0-0.dta")
 
-
-
-data_sm_relevance <- read.csv("data/sm_relevance.csv")
-
-
-# Use field_start as the time variable; treat m0001_3 as a factor
-df_shares <- data_sm_relevance |>
-  mutate(
-    time_period = as.Date(field_start),
-    value = factor(m0001_3,
-      levels = 1:7,
-      labels = c(
-        "TV",
-        "Newspaper (incl. online)",
-        "Radio",
-        "Social media",
-        "Other internetmedia (e.g. e-mail-provider, blogs)",
-        "Personal communication",
-        "Other source"
-      )
-    )
-  ) |>
-  count(time_period, value) |>
-    group_by(time_period) |>
-  mutate(share = n / sum(n)) |>
-  ungroup()
-
-# Define a colour palette for the distinct values
-n_vals <- n_distinct(df_shares$value)
-palette <- setNames(
-  colorRampPalette(c("#2166ac", "#4dac26", "#d01c8b", "#f1a340", "#762a83", "#e66101", "#1b7837"))(n_vals),
-  levels(df_shares$value)
-)
- 
-
-# Build the plot
-p <- ggplot(df_shares, aes(x = time_period, y = share, colour = value, group = value)) +
-  geom_line(linewidth = 0.9) +
-  geom_point(size = 2.2) +
-  scale_x_date(
-    date_labels = "%b %Y",
-    date_breaks = "6 months",
-    expand = expansion(mult = 0.03)
-  ) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  scale_colour_manual(values = palette, name = "Source") +
-  labs(
-    title    = "Relevance of different media as political information source over time",
-    subtitle = "Each line represents one response category",
-    x        = "Survey Wave Start Date",
-    y        = "Share"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title       = element_text(face = "bold", size = 15),
-    plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
-    legend.position  = "right",
-    axis.text.x      = element_text(angle = 30, hjust = 1),
-    panel.grid.minor = element_blank()
-  )
-
-# Save
-ggsave("social_media_relevance_overtime.png", plot = p, width = 10, height = 6, dpi = 150)
-message("Plot saved to social_media_relevance_overtime.png")
-
-
-
-
-reference_year <- 2020
- 
-# Parse s0002: str_extract pulls the 4-digit year from both plain values ("1979")
-# and censored strings ("1956 und frueher"). The latter are treated as born in
-# that year or earlier, so using the extracted year gives a conservative age estimate.
-df <- data_sm_relevance %>%
-  mutate(
-    birth_year = as.integer(str_extract(s0002, "\\d{4}")),
-    age        = reference_year - birth_year,
-    age_group  = cut(age,
-      breaks = c(14, 29, 39, 49, 59, 69, Inf),
-      labels = c("15-29", "30-39", "40-49", "50-59", "60-69", "70+"),
-      right  = TRUE
-    )
-  ) %>%
-  filter(!is.na(age_group))
- 
-# Compute share of social media (m0001_3 == 4) per wave and age group
-df_counts <- df %>%
-  mutate(time_period = as.Date(field_start)) %>%
-  group_by(time_period, age_group) %>%
-  summarise(
-    share = mean(m0001_3 == 4, na.rm = TRUE),
-    .groups = "drop"
-  )
- 
-# Colour palette
-age_palette <- c(
-  "15-29" = "#2166ac",
-  "30-39" = "#4dac26",
-  "40-49" = "#d01c8b",
-  "50-59" = "#f1a340",
-  "60-69" = "#762a83",
-  "70+"   = "#b2182b"
-)
- 
-# Build plot
-p <- ggplot(df_counts, aes(x = time_period, y = share, colour = age_group, group = age_group)) +
-  geom_line(linewidth = 0.9) +
-  geom_point(size = 2.2) +
-  scale_x_date(
-    date_labels = "%b %Y",
-    date_breaks = "6 months",
-    expand = expansion(mult = 0.03)
-  ) +
-  scale_y_continuous(
-    labels = scales::percent_format(accuracy = 1),
-    limits = c(0, NA)
-  ) +
-  scale_colour_manual(values = age_palette, name = "Altersgruppe") +
-  labs(
-    title    = "Anteil soziale Medien als Hauptinformationsquelle nach Altersgruppe",
-    subtitle = "Anteil der Befragten, die soziale Medien (m0001_3 = 4) angaben",
-    x        = "Erhebungszeitraum (Beginn)",
-    y        = "Anteil"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title       = element_text(face = "bold", size = 14),
-    plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
-    legend.position  = "right",
-    axis.text.x      = element_text(angle = 30, hjust = 1),
-    panel.grid.minor = element_blank()
-  )
- 
-# Save
-ggsave("plot_socialmedia_age.png", plot = p, width = 10, height = 6, dpi = 150)
-message("Plot saved to plot_socialmedia_age.png")
-
-
-
-df_youngvsold <- data_sm_relevance %>%
-  mutate(
-    birth_year = as.integer(str_extract(s0002, "\\d{4}")),
-    age        = reference_year - birth_year,
-    age_group  = case_when(
-      age >= 18 & age <= 29 ~ "Jung (18-29)",
-      age >= 30             ~ "Aelter (30+)",
-      TRUE                  ~ NA_character_
-    ),
-    time_period = as.Date(field_start),
-    source = factor(m0001_3,
-      levels = 1:7,
-      labels = c(
-        "Fernsehen (inkl. Mediathek)",
-        "Zeitung (inkl. Onlineangebot)",
-        "Radio (inkl. Webradio)",
-        "Soziale Medien",
-        "Andere Internetanbieter",
-        "Persoenliches Gespraech",
-        "Andere Quelle"
-      )
-    )
-  ) %>%
-  filter(!is.na(age_group), !is.na(source))
- 
-# Compute share of each source within age group x wave
-df_counts <- df_youngvsold %>%
-  group_by(time_period, age_group, source) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  group_by(time_period, age_group) %>%
-  mutate(share = n / sum(n)) %>%
-  ungroup()
- 
-# Colour palette per source
-source_palette <- c(
-  "Fernsehen (inkl. Mediathek)"   = "#1f78b4",
-  "Zeitung (inkl. Onlineangebot)" = "#33a02c",
-  "Radio (inkl. Webradio)"        = "#ff7f00",
-  "Soziale Medien"                = "#e31a1c",
-  "Andere Internetanbieter"       = "#6a3d9a",
-  "Persoenliches Gespraech"       = "#b15928",
-  "Andere Quelle"                 = "#a6a6a6"
-)
- 
-# Plot — faceted by age group, one line per source
-p <- ggplot(df_counts, aes(x = time_period, y = share, colour = source, group = source)) +
-  geom_line(linewidth = 0.9) +
-  geom_point(size = 2) +
-  facet_wrap(~ age_group, ncol = 1) +
-  scale_x_date(
-    date_labels = "%b %Y",
-    date_breaks = "6 months",
-    expand = expansion(mult = 0.03)
-  ) +
-  scale_y_continuous(
-    labels = scales::percent_format(accuracy = 1),
-    limits = c(0, NA)
-  ) +
-  scale_colour_manual(values = source_palette, name = "Informationsquelle") +
-  labs(
-    title    = "Informationsquellen nach Altersgruppe ueber Zeit",
-    subtitle = "Anteil der Befragten pro Quelle, aufgeteilt nach Jung (18-29) vs. Aelter (30+)",
-    x        = "Erhebungszeitraum (Beginn)",
-    y        = "Anteil"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title       = element_text(face = "bold", size = 14),
-    plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
-    legend.position  = "right",
-    axis.text.x      = element_text(angle = 30, hjust = 1),
-    panel.grid.minor = element_blank(),
-    strip.text       = element_text(face = "bold", size = 12)
-  )
- 
-# Save
-ggsave("plot_sources_by_agegroup.png", plot = p, width = 11, height = 9, dpi = 150)
-message("Plot saved to plot_sources_by_agegroup.png")
-
-
-
-
-
-
-# create a plot that shows party vote intention by age group
-df_vote_intention <- data_sm_relevance %>%
-  mutate(
-    birth_year = as.integer(str_extract(s0002, "\\d{4}")),
-    age        = reference_year - birth_year,
-    age_group  = case_when(
-      age <= 29 ~ "young (18-29)",
-      age >= 30 & age <= 39 ~ "30er (18-29)",
-      age >= 40 & age <= 49 ~ "40er (18-29)",
-      age >= 50             ~ "older (30+)",
-      TRUE                  ~ NA_character_
-    ),
-    time_period = as.Date(field_start),
-    vote_intention = factor(e0003a_1,
-      levels = 1:7,
-      labels = c(
-        "CDU/CSU",
-        "SPD",
-        "AfD",
-        "FDP",
-        "Die Linke",
-        "Bündnis 90/Die Grünen",
-        "Andere Partei"
-      )
-    )
-  ) %>%
-  filter(!is.na(age_group), !is.na(vote_intention))
-
-plot <- ggplot(df_vote_intention, aes(x = time_period, fill = vote_intention)) +
-  geom_bar(position = "fill") +
-  facet_wrap(~ age_group, ncol = 1) +
-  scale_x_date(
-    date_labels = "%b %Y",
-    date_breaks = "6 months",
-    expand = expansion(mult = 0.03)
-  ) +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  scale_fill_manual(values = source_palette, name = "Parteipräferenz") +
-  labs(
-    title    = "Parteipräferenz nach Altersgruppe über Zeit",
-    subtitle = "Anteil der Befragten pro Parteipräferenz, aufgeteilt nach Jung (18-29) vs. Älter (30+)",
-    x        = "Erhebungszeitraum (Beginn)",
-    y        = "Anteil"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(
-    plot.title       = element_text(face = "bold", size = 14),
-    plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
-    legend.position  = "right",
-    axis.text.x      = element_text(angle = 30, hjust = 1),
-    panel.grid.minor = element_blank(),
-    strip.text       = element_text(face = "bold", size = 12)
-  )
-
-ggsave(plot, filename = "plot_vote_intention_by_agegroup.png", width = 11, height = 9, dpi = 150)
-
-
-# plot social media relevance over time by vote intention
-
-
-df_counts <- data_sm_relevance |>
-  group_by(time_period, vote_intention_zweitstimme, media_info_source) |>
-  summarise(n = n(), .groups = "drop") |>
-  group_by(time_period, vote_intention_zweitstimme) |>
-  mutate(share = n / sum(n)) |>
-  ungroup() |> filter(!is.na(vote_intention_zweitstimme))
-
- 
-# Plot — faceted by age group, one line per source
-p2 <- ggplot(df_counts, aes(x = time_period, y = share, colour = media_info_source, group = media_info_source)) +
-  geom_line(linewidth = 0.9) +
-  geom_point(size = 2) +
-  facet_wrap(~ vote_intention_zweitstimme, ncol = 1) +
-  scale_x_date(
-    date_labels = "%b %Y",
-    date_breaks = "6 months",
-    expand = expansion(mult = 0.03)
-  ) +
-  scale_y_continuous(
-    labels = scales::percent_format(accuracy = 1),
-    limits = c(0, NA)
-  ) +
-  # scale_colour_manual(values = source_palette, name = "Vote intention") +
-  labs(
-    title    = "Political information source by vote intention (Zweitstimme) over time",
-    subtitle = "Share of respondents per source, split by vote intention",
-    x        = "Survey period (start)",
-    y        = "Share"
-  ) +
-  theme_minimal(oase_size = 13) +
-  theme(
-    plot.title       = element_text(face = "bold", size = 14),
-    plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
-    legend.position  = "right",
-    axis.text.x      = element_text(angle = 30, hjust = 1),
-    panel.grid.minor = element_blank(),
-    strip.text       = element_text(face = "bold", size = 12)
-  )
-
-# Save
-# ggsave("plot_sources_by_vote_intention.png", plot = p2, width = 11, height = 9, dpi = 150)
-# p2
-
-
-
-
-
-
-
-
-## Bundestag Speeches
-
-
-
-
-
-bt_speeches <- readRDS("data/bt_speeches.rds")
-
-bt_speeches <- bt_speeches |> mutate(Party = case_when(
-  Party == "afd" ~ "AfD",
-  Party == "cdu" ~ "CDU",
-  Party == "fdp" ~ "FDP",
-  Party == "spd" ~ "SPD",
-  Party == "die grünen" ~ "B90/Grüne",
-  Party == "linke/pds/sed" ~ "Linke",
-  grepl("fraktionslos", Party) ~ "fraktionslos"
+info_source_data <- gles_data |> subset(select = c(
+  "field_start", "field_end", "sample", "version", "lfdn", "lfdn_od",
+  "m0001_1", "m0001_2", "m0001_3", "s0002",
+  "e0003a_1", "e0003a_2", "e0003b_1", "e0003b_2"
 ))
+
+info_source_data[info_source_data$m0001_3 %in% c(-99:-71), ] <- NA
+info_source_3 <- info_source_data[!is.na(info_source_data$m0001_3), ]
+
+info_source_3$e0003a_1[info_source_3$e0003a_1 == -94] <- NA
+info_source_3$e0003a_2[info_source_3$e0003a_2 == -94] <- NA
+info_source_3$e0003b_1[info_source_3$e0003b_1 == -94] <- NA
+info_source_3$e0003b_2[info_source_3$e0003b_2 == -94] <- NA
+
+info_source_3 <- info_source_3 |> mutate(
+  vote_intention_erststimme = str_remove(paste0(e0003a_1, e0003a_2), "NA"),
+  vote_intention_zweitstimme = str_remove(paste0(e0003b_1, e0003b_2), "NA")
+)
+
+recode_vote <- function(x) {
+  case_when(
+    x == "1"   ~ "1", # CDU/CSU
+    x == "4"   ~ "2", # SPD
+    x == "322" ~ "3", # AfD
+    x == "5"   ~ "4", # FDP
+    x == "6"   ~ "5", # Bündnis 90/Die Grünen
+    x == "7"   ~ "6", # Die Linke
+    TRUE        ~ NA_character_
+  )
+}
+
+vote_levels  <- c("1", "2", "3", "4", "5", "6", "7")
+vote_labels  <- c("CDU/CSU", "SPD", "AfD", "FDP", "Bündnis 90/Die Grünen", "Die Linke", "Other parties")
+
+info_source_3 <- info_source_3 |> mutate(
+  vote_intention_erststimme  = factor(recode_vote(vote_intention_erststimme),  levels = vote_levels, labels = vote_labels),
+  vote_intention_zweitstimme = factor(recode_vote(vote_intention_zweitstimme), levels = vote_levels, labels = vote_labels)
+)
+
+colnames(info_source_3)[colnames(info_source_3) == "m0001_3"] <- "media_info_source"
+colnames(info_source_3)[colnames(info_source_3) == "s0002"]   <- "birth_year"
+
+info_source_3 <- info_source_3[, c(
+  "field_start", "field_end", "sample", "version", "lfdn", "lfdn_od",
+  "media_info_source", "birth_year", "vote_intention_erststimme", "vote_intention_zweitstimme"
+)]
+
+info_source_3 <- info_source_3 |> mutate(
+  birth_year  = as.integer(str_extract(birth_year, "\\d{4}")),
+  age         = as.integer(str_extract(field_start, "\\d{4}")) - birth_year,
+  age_group   = case_when(
+    age <= 29                 ~ "18-29",
+    age >= 30 & age <= 39    ~ "30-39",
+    age >= 40 & age <= 49    ~ "40-49",
+    age >= 50                 ~ "50+",
+    TRUE                      ~ NA_character_
+  ),
+  time_period = as.Date(field_start)
+)
+
+info_source_3$media_info_source[info_source_3$media_info_source == 5] <- 7
+info_source_3$media_info_source[info_source_3$media_info_source == 6] <- 5
+info_source_3$media_info_source[info_source_3$media_info_source == 7] <- 6
+
+info_source_3 <- info_source_3 |> mutate(
+  media_info_source = factor(media_info_source,
+    levels = 1:6,
+    labels = c("TV", "Newspaper", "Radio", "Social media", "Personal conversation", "Other source")
+  )
+)
+
+saveRDS(info_source_3, "data/sm_relevance.rds")
+
+# --- Bundestag speeches ---
+topic_df <- readRDS("data/topic_proportions_dpi3.rds")
+
+bt_speeches <- topic_df$merged_sentences
+bt_speeches <- bt_speeches |> filter(is.na(top_topic_name) | !grepl("procedural", top_topic_name))
 
 bt_speeches_long <- bt_speeches |>
   pivot_longer(
-    cols = c(Anti.Elitism, People.Centrism, Left.Wing.Host.Ideology, Right.Wing.Host.Ideology),
+    cols = c(Anti.Elitism_pred, People.Centrism_pred, Left.Wing.Host.Ideology_pred, Right.Wing.Host.Ideology_pred),
     names_to  = "populist_dimension",
     values_to = "score"
   )
 bt_speeches_long$Date <- as.Date(bt_speeches_long$Date)
 
-
-
 saveRDS(bt_speeches_long, "data/bt_speeches_long.rds")
 
-sum_stat = subset(bt_speeches, select = c("Party", "n_party_members")) |> unique()
-
+sum_stat <- subset(bt_speeches, select = c("Party", "n_party_members")) |> unique()
 print(sum_stat)
-print(bt_speeches[bt_speeches$n_party_members == max(bt_speeches$n_party_members),]$Party |> unique())
 
+bt_speeches <- bt_speeches |> group_by(Name, Party) |> mutate(mean_pop_per_speaker = mean(populist_mean))
+bt_speeches |> arrange(desc(mean_pop_per_speaker)) |> subset(select = c(Name, mean_pop_per_speaker, Party, sentence))
+most_populist_speakers <- bt_speeches[bt_speeches$mean_pop_per_speaker == max(bt_speeches$mean_pop_per_speaker), ]
 
+make_subset <- function(dim_name) {
+  df           <- bt_speeches_long[bt_speeches_long$populist_dimension == dim_name, ]
+  df           <- df[!is.na(df$top_topic), ]    # speeches dropped by DFM have NA top_topic; remove before glm
+  df$date_num  <- as.numeric(df$Date)           # days from epoch → continuous time trend
+  df$Party     <- relevel(factor(df$Party), ref = "SPD")
+  df$top_topic <- factor(df$top_topic)
+  df
+}
 
+ae_d <- make_subset("Anti.Elitism_pred")
+pc_d <- make_subset("People.Centrism_pred")
+lw_d <- make_subset("Left.Wing.Host.Ideology_pred")
+rw_d <- make_subset("Right.Wing.Host.Ideology_pred")
 
+m_ae <- glm(score ~ date_num + Party + top_topic, data = ae_d, family = binomial)
+m_pc <- glm(score ~ date_num + Party + top_topic, data = pc_d, family = binomial)
+m_lw <- glm(score ~ date_num + Party + top_topic, data = lw_d, family = binomial)
+m_rw <- glm(score ~ date_num + Party + top_topic, data = rw_d, family = binomial)
 
-colnames(bt_speeches)
-score_over_time_perparty <- bt_speeches |> filter(!grepl("fraktionslos", Party))
-nrow(score_over_time_perparty) - nrow(bt_speeches)
+saveRDS(m_ae, "data/m_ae.rds")
+saveRDS(m_pc, "data/m_pc.rds")
+saveRDS(m_lw, "data/m_lw.rds")
+saveRDS(m_rw, "data/m_rw.rds")
 
+vcov_ae <- vcovCL(m_ae, cluster = ae_d$speech_id)
+vcov_pc <- vcovCL(m_pc, cluster = pc_d$speech_id)
+vcov_lw <- vcovCL(m_lw, cluster = lw_d$speech_id)
+vcov_rw <- vcovCL(m_rw, cluster = rw_d$speech_id)
 
-
-score_over_time_plot <- ggplot(score_over_time_perparty, aes(x=Date, y=Anti.Elitism, group=Party, color=Party)) +
-geom_point() +
-geom_smooth() +
-facet_wrap( ~ Party)
-score_over_time_plot |> ggsave(filename="plot_pop_score_overtime_byparty.png")
-
-
-
-
-bt_speeches <- bt_speeches |> group_by(MPID) |> mutate(mean_pop_per_speaker = mean(populist_mean))
-
-bt_speeches |> arrange(desc(mean_pop_per_speaker)) |> subset(select=c(MPID, mean_pop_per_speaker, Party, sentence))
-most_populist_speakers <- bt_speeches[bt_speeches$mean_pop_per_speaker == max(bt_speeches$mean_pop_per_speaker),]
-
-View(most_populist_speakers)
-
-
-
-# regression analysis with dv = populist_mean, iv = relevance_sm, control for party_affiliation, speaker_fixed_effects
-
-topic_proportions_base <- readRDS("data/topic_proportions_digitization.rds")
-topic_weighted <- readRDS("data/topic_populism_soft_weighted_digitization.rds")
-topic_proportions <- topic_proportions_base$merged
-
-p <- ggplot(topic_proportions, aes(x=top_topic, y=populist_mean)) +
-  geom_point()
-
-ggsave(p, filename = "plot_populism_by_topic.png", width = 10, height = 6, dpi = 150)
-
+saveRDS(list(ae = vcov_ae, pc = vcov_pc, lw = vcov_lw, rw = vcov_rw), "data/model_vcovs.rds")
