@@ -2,8 +2,8 @@ library(dplyr)
 library(tidyr)
 library(stringr)
 library(haven)
-library(sandwich)
 library(lubridate)
+library(lme4)
 
 # --- GLES survey data wrangling ---
 gles_data <- haven::read_dta("data/ZA6832_v2-0-0.dta")
@@ -81,7 +81,7 @@ info_source_3 <- info_source_3 |> mutate(
 
 saveRDS(info_source_3, "data/sm_relevance.rds")
 
-# --- Bundestag speeches ---
+# --- Bundestag speeches data wrangling and analysis---
 topic_df <- readRDS("data/topic_proportions_dpi3.rds")
 
 bt_speeches <- topic_df$merged_sentences
@@ -106,10 +106,11 @@ most_populist_speakers <- bt_speeches[bt_speeches$mean_pop_per_speaker == max(bt
 
 make_subset <- function(dim_name) {
   df           <- bt_speeches_long[bt_speeches_long$populist_dimension == dim_name, ]
-  df           <- df[!is.na(df$top_topic), ]    # speeches dropped by DFM have NA top_topic; remove before glm
-  df$date_num  <- as.numeric(df$Date)           # days from epoch → continuous time trend
+  df           <- df[!is.na(df$top_topic), ]                          # drop DFM-excluded speeches
+  df           <- df[!grepl("^Other", df$top_topic_name), ]           # drop residual keyATM topics
+  df$date_num  <- scale(as.numeric(df$Date))[, 1]  # standardise: fixes large-eigenvalue warning from glmer
   df$Party     <- relevel(factor(df$Party), ref = "SPD")
-  df$top_topic <- factor(df$top_topic)
+  df$top_topic <- factor(df$top_topic)                                 # droplevels implicit in factor()
   df
 }
 
@@ -118,22 +119,17 @@ pc_d <- make_subset("People.Centrism_pred")
 lw_d <- make_subset("Left.Wing.Host.Ideology_pred")
 rw_d <- make_subset("Right.Wing.Host.Ideology_pred")
 
-m_ae <- glm(score ~ date_num + Party + top_topic, data = ae_d, family = binomial)
-m_pc <- glm(score ~ date_num + Party + top_topic, data = pc_d, family = binomial)
-m_lw <- glm(score ~ date_num + Party + top_topic, data = lw_d, family = binomial)
-m_rw <- glm(score ~ date_num + Party + top_topic, data = rw_d, family = binomial)
+ctrl <- glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5))
+m_ae <- glmer(score ~ date_num + Party + top_topic + (1 | Name), data = ae_d, family = binomial, control = ctrl, nAGQ = 0)
+m_pc <- glmer(score ~ date_num + Party + top_topic + (1 | Name), data = pc_d, family = binomial, control = ctrl, nAGQ = 0)
+m_lw <- glmer(score ~ date_num + Party + top_topic + (1 | Name), data = lw_d, family = binomial, control = ctrl, nAGQ = 0)
+m_rw <- glmer(score ~ date_num + Party + top_topic + (1 | Name), data = rw_d, family = binomial, control = ctrl, nAGQ = 0)
 
 saveRDS(m_ae, "data/m_ae.rds")
 saveRDS(m_pc, "data/m_pc.rds")
 saveRDS(m_lw, "data/m_lw.rds")
 saveRDS(m_rw, "data/m_rw.rds")
 
-vcov_ae <- vcovCL(m_ae, cluster = ae_d$speech_id)
-vcov_pc <- vcovCL(m_pc, cluster = pc_d$speech_id)
-vcov_lw <- vcovCL(m_lw, cluster = lw_d$speech_id)
-vcov_rw <- vcovCL(m_rw, cluster = rw_d$speech_id)
-
-saveRDS(list(ae = vcov_ae, pc = vcov_pc, lw = vcov_lw, rw = vcov_rw), "data/model_vcovs.rds")
 
 
 count_ae <- bt_speeches[bt_speeches$Anti.Elitism_pred == 1,] |> nrow()
@@ -157,16 +153,25 @@ dim_labels <- c(
 )
 
 # --- Figure 4: Speaker-level lollipop ---
-fig_speaker_pop <- bt_speeches |>
+speaker_summary <- bt_speeches |>
   group_by(Name, Party) |>
   summarise(
     mean_pop    = mean(populist_mean, na.rm = TRUE),
     n_sentences = n(),
     .groups     = "drop"
   ) |>
-  filter(n_sentences >= 100, !is.na(Party), Party != "") |>
+  filter(n_sentences >= 100, !is.na(Party), Party != "")
+
+party_medians <- speaker_summary |>
   group_by(Party) |>
-  slice_max(mean_pop, n = 3) |>
+  summarise(median_pop = median(mean_pop, na.rm = TRUE), .groups = "drop")
+
+fig_speaker_pop <- bind_rows(
+  speaker_summary |> group_by(Party) |> slice_max(mean_pop, n = 2),
+  speaker_summary |> group_by(Party) |> slice_min(mean_pop, n = 2)
+) |>
+  distinct(Name, Party, .keep_all = TRUE) |>
+  left_join(party_medians, by = "Party") |>
   ungroup() |>
   arrange(Party, mean_pop) |>
   mutate(Name = factor(Name, levels = unique(Name)))
@@ -207,6 +212,22 @@ fig_topic_party_pop <- bt_speeches_long |>
   filter(!is.na(topic_label), !is.na(dim_label))
 
 saveRDS(fig_topic_party_pop, "data/fig_topic_party_pop.rds")
+
+# Topic coefficient labels for regression table (maps top_topicN -> nice name)
+topic_coef_labels <- bt_speeches |>
+  filter(!is.na(top_topic), !is.na(top_topic_name)) |>
+  select(top_topic, top_topic_name) |>
+  distinct() |>
+  arrange(top_topic) |>
+  mutate(
+    short_name = str_remove(top_topic_name, "^\\d+_"),
+    nice_name  = {
+      lkp <- topic_nice_labels[short_name]
+      ifelse(!is.na(lkp), lkp, str_to_title(short_name))
+    },
+    coef_name  = paste0("top_topic", top_topic)
+  )
+saveRDS(topic_coef_labels, "data/topic_coef_labels.rds")
 
 # --- Figure 11: Social media share vs. populism over time ---
 sm_over_time <- info_source_3 |>
