@@ -40,6 +40,7 @@ bt_sentences <- bt_sentences |> mutate(Party = case_when(
 
 cat("Speeches:", nrow(bt_speeches_dpi), "| Sentences:", nrow(bt_sentences), "\n")
 
+# Disclaimer: following comment was added by Claude Code.
 # Corpus at speech level — speeches are the natural topical unit for keyATM.
 # bt_speeches_dpi$speech_id (sequential 1..N) is used as corpus docid.
 # bt_sentences$speech_id = Python's pandas index = bt_speeches_dpi$X (original R row names);
@@ -177,10 +178,13 @@ top_words(keyatm_model_digitization, n=20)
 
 # Disclaimer: following code was partly created by Claude Sonnet 4.6 through iterations of prompting
 
-create_topic_df <- function(keyatm_model, bt_speeches_dpi, bt_sentences) {
-  # rownames of theta are speech_ids of the speeches that survived DFM trimming
+create_topic_df <- function(keyatm_model, bt_speeches_dpi, bt_sentences, dfm) {
+  # keyATM theta rownames may be NULL in some package versions; fall back to dfm docnames.
+  # docnames(dfm) == corpus docnames == bt_speeches_dpi$speech_id (sequential 1..N).
   topic_df <- as.data.frame(keyatm_model$theta)
-  topic_df$speech_id <- as.integer(rownames(keyatm_model$theta))
+  doc_ids  <- rownames(keyatm_model$theta)
+  if (is.null(doc_ids)) doc_ids <- docnames(dfm)
+  topic_df$speech_id <- as.integer(doc_ids)
 
   # Attach topic proportions to speech-level data and derive top_topic
   merged_speeches <- bt_speeches_dpi |>
@@ -207,7 +211,8 @@ create_topic_df <- function(keyatm_model, bt_speeches_dpi, bt_sentences) {
 merged_digitization <- create_topic_df(
   keyatm_model    = keyatm_model_digitization,
   bt_speeches_dpi = bt_speeches_dpi,
-  bt_sentences    = bt_sentences
+  bt_sentences    = bt_sentences,
+  dfm             = dfm_trim_clean
 )
 
 cat("Sentences with missing top_topic:", sum(is.na(merged_digitization$merged_sentences$top_topic)), "\n")

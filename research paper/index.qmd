@@ -11,6 +11,7 @@ execute:
 output:
   pdf_document:
     extra_dependencies: ["longtable", "float"]
+    toc: true
 ---
 
 ```{r}
@@ -40,12 +41,23 @@ m_pc <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/m_pc.rds
 m_lw <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/m_lw.rds")
 m_rw <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/m_rw.rds")
 model_vcovs <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/model_vcovs.rds")
-keyatm_model <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/keyatm_model_digitization3.rds")
+keyatm_model    <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/keyatm_model_digitization3.rds")
+fig_speaker_pop <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/fig_speaker_pop.rds")
+fig_topic_party <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/fig_topic_party_pop.rds")
+fig_time_trends <- readRDS("C:/Users/rober/UCD/pol42050/new-sound-of-politics/data/fig_time_trends.rds")
+
+bundestag_palette <- c(
+  "CDU/CSU" = "#000000", "CDU" = "#333333", "CSU" = "#555555",
+  "SPD"     = "#E3000F", "AfD" = "#009EE0", "FDP" = "#FFED00",
+  "B90/Die Grünen" = "#1FA12D", "Die Linke" = "#BE3075", "BSW" = "#9B4A97"
+)
 
 theme_set(theme_minimal())
+options(knitr.table.format = "latex")
 
 ```
 
+# Abstract
 
 
 # Introduction
@@ -55,9 +67,7 @@ The political calculation for creating content like this is the following: Highe
 
 A recent study of party-related posts on social media in Germany showcases that politicians from parties on the political fringes are more engaged and successful in their social media presence. Posts that are in connection to extremer parties are shown much quicker than posts of parties in the political centre [@verwiebe_digitalisiert_2025]. Political entertainment is just one topic displayed on social media feeds along with comedy, lifestyle, technology, gaming, cooking and more. This way, political information seamlessly reaches broader audiences. One type of posts is especially interesting: Snippets of parliamentary speeches.
 
-Before social media and the internet, parliamentary debates have not been present in peoples everyday life. Who would voluntarily watch debates unfiltered for hours unpaid? Newspapers and TV-news shows have been the filtering lense through which people perceived a curated subset of the words spoken in parliament. Due to social media, many Germans nowadays know exactly how the speakers desk of the Bundestag looks like. Snippets of speeches are frequently posted on social media by parties, politicians or other party-affiliated actors [@sternberg_afd-abgeordnete_2026]. Politicians have an incentive to hold speeches that maximize reach. Although social media has been one of the main drivers of social science research, the evergrowing relevance for it motivates to look at the rhetoric changes in political bodies once again.
-
-TODO in the end: create a zusammenfassung with logic arrowqs and stuff
+Before social media and the internet, parliamentary debates have not been present in peoples everyday life. Who would voluntarily watch debates unfiltered for hours unpaid? Newspapers and TV-news shows have been the filtering lense through which people perceived a curated subset of the words spoken in parliament. Due to social media, many Germans nowadays know exactly how the speakers desk of the Bundestag looks like. Snippets of speeches are frequently posted on social media by parties, politicians or other party-affiliated actors [@sternberg_afd-abgeordnete_2026].
 
 ## Research Question
 
@@ -65,15 +75,15 @@ The relevance of the possibility of a social-media-fication of parliamentary rhe
 
 The questions guiding this paper therefore will be following:
 
-*How has parliamentary rhetoric in the German Bundestag changed in recent years? Has it become more populist? And if so, how does that most recent populism sound like?*
+*What elements of populist rhetoric occur in parliamentary speeches? Could the way populist rhetoric is employed be influenced by politicians goal to create reach on social media?*
 
 # Literature Review
 
 A common narrative found in European media outlets is that populism and its rhetorical traits have risen during the last years. Some scholars question this narrative and indeed find evidence that the situation is more complicated. In the Netherlands, the occurance of populist rhetoric seems to follow no clear trend. This might be due to self-dooming nature of the anti-establishment rhetoric. After populist parties achieve electoral success, they have joined the establishment and it becomes harder to credibly criticise it [@bos_populist_2014].
 
-This is in line with the claim of populism being endemic in Europe. It has not risen in the last few years, it has long found its way into political rhetoric across all parties [@mazzoleni_socially_2018]. Populist rhetoric is not exclusive to obviously populist figures. It has become a toolbox for a multitude of political figures to choose from. Ofcourse not every politician uses the same rhetoric tools. One goal of this work is to identify how populist rhetoric differs across parties. To do this, it first need to be clear, what populism is.
+This is in line with the claim of populism being endemic in Europe. It has not risen in the last few years, it has long found its way into political rhetoric across many parties [@mazzoleni_socially_2018]. Populist rhetoric is not exclusive to obviously populist figures. It has become a toolbox for a multitude of political figures to choose from. Ofcourse not every politician uses the same rhetoric tools. One goal of this work is to identify how populist rhetoric differs across parties. To do this, it first need to be clear, what populism is.
 
-Defining populism is a near impossible task. Scholars have even referred to this struggle as Cinderella-complex (Aschenputtel-Komplex): There is a shoe formed like populism, but there is no foot fitting the shoe [@priester_rechter_2012]. Nevertheless, one definition has been widely adopted to act as a common baseline understanding of populism; the "ideational" approach. It defines populism as a “thin-centered ideology that considers society to be ultimately separated into two homogeneous and antagonistic groups, ‘the pure people’ versus the ‘corrupt elite,’ and which argues that politics should be an expression of the volonté générale (general will) of the people” [@mudde_populist_2007, p.23]. Populism as thin-centered ideology includes an appeal to "the people" and attacking the elites. An extensive amount of literature relies on these or in their meaning similar concepts [@mazzoleni_socially_2018; @yilmaz_populism_2026; @priester_rechter_2012; @roth_right-wing_2023]. This paper therefore uses these common traits and adds two more in accordance to @erhard_popbert_2025 that enhance the grasp of the concept based on the understanding that populism occurs in the real world often attached to a "host ideology" [@hunger_whats_2022]. This approach has been the base to the definition used by @erhard_popbert_2025 to identify criteria for the training of a NLP transformer model called "PopBert". Additionaly, they add two "thickening" criteria, namely left-wing or right-wing populism. The model therefore rates text on four dimensions: anti-elitism, people-centrism, left-wing host-ideology and right-wing host-ideology.
+Defining populism is a near impossible task. Scholars have even referred to this struggle as Cinderella-complex (Aschenputtel-Komplex): There is a shoe formed like populism, but there is no foot fitting the shoe [@priester_rechter_2012]. Nevertheless, one definition has been widely adopted to act as a common baseline understanding of populism; the "ideational" approach. It defines populism as a “thin-centered ideology that considers society to be ultimately separated into two homogeneous and antagonistic groups, ‘the pure people’ versus the ‘corrupt elite,’ and which argues that politics should be an expression of the volonté générale (general will) of the people” [@mudde_populist_2007, p.23]. Populism as thin-centered ideology includes an appeal to "the people" and attacking the elites. An extensive amount of literature relies on these or in their meaning similar concepts [@mazzoleni_socially_2018; @yilmaz_populism_2026; @priester_rechter_2012; @roth_right-wing_2023]. This paper therefore uses these common traits and adds two more in accordance to @erhard_popbert_2025 that enhance the grasp of the concept based on the understanding that populism occurs in the real world often attached to a "host ideology" [@hunger_whats_2022]. This approach has been the base to the definition used by @erhard_popbert_2025 to identify criteria for the training of a NLP transformer model called "PopBERT". Additionaly, they add two "thickening" criteria, namely left-wing or right-wing populism. The model therefore rates text on four dimensions: anti-elitism, people-centrism, left-wing host-ideology and right-wing host-ideology.
 
 ## Modern populist rhetoric
 
@@ -83,16 +93,143 @@ Few scholars try to distinguish between types of populist rhetoric. Everything s
 
 ## Social media and populism
 
-Before the rise of social media politicians ways of communicating with the electorate were restricted to the rules and filters of media outlets and reporters when communicating with the masses. Media was seen as something the politicians needed to become popular. Nowadays, the relationship shifted. Popular politicians are needed by the media to generate engagement and therefore revenue [@mazzoleni_socially_2018]. Instead of the filtering lenses of journalists, the rules of algorithms now dictates which messages are communicated to the masses.
+Politicians ways of communicating with the electorate used to be restricted to the rules and filters of media outlets and reporters when communicating with the masses. Nowadays, the relationship shifted. Instead of the filtering lenses of journalists, the rules of algorithms now dictates which messages are communicated to the masses.
 
 Since it has become evident that politicians successfully utilise this lacking filter via social media, a lot of research on populist rhetoric focused on and supported this claim [@stieglitz_social_2013; @engesser_populism_2017; @mazzoleni_socially_2018; @mutascu_online_2025; @stavrakakis_research_2024; @bos_populist_2014; @bobba_likeability_2018; @blassnig_populist_2021].
 
 Digital media has introduced a quick and intense change into how we think political information is consumed by the electorate. Consuming political online content can contribute to political participation [@kahne_political_2018; @boulianne_social_2015]. Political communication on social media seems to benefit right-wing parties more than left-wing parties [@mutascu_online_2025]. Political communication that employs populist rhetoric on social media differs across parties. Left-wing populists prefer attacks on the economic elite while right-wing populists predominantly attack the media elite and ostracise outgroups [@engesser_populism_2017].
 
-Social media performance plays an increasingly important role in parties communication strategies. Parties pay attention to the performance of their social media posts and the engagement with them and adjust their strategy accordingly [@ennser-jedenastik_does_2022]. Since social media proved to be an effective tool for influencing public opinion, political advisors have put more salience on social media [@lilleker_towards_2015]. It is therefore reasonable to assume that parties try to increase their social media reach, for example by using populist rhetoric in speech snippets from parliamentary bodies.
+Social media performance plays an increasingly important role in parties communication strategies. Parties pay attention to the performance of their social media posts and the engagement with them and adjust their strategy accordingly [@ennser-jedenastik_does_2022]. Since social media proved to be an effective tool for influencing public opinion, political advisors have directed more salience towards it [@lilleker_towards_2015]. It is therefore reasonable to assume that parties try to increase their social media reach, for example by using populist rhetoric in speech snippets from parliamentary bodies.
+
 
 ```{r}
-#| label: fig-1
+#| label: fig-vote-intention
+#| fig-cap: "Party vote intention by age group over time (GLES panel data)."
+#| fig-height: 10
+#| fig-width: 12
+
+party_palette <- c(
+  "CDU/CSU"               = "#000000",
+  "SPD"                   = "#E3000F",
+  "AfD"                   = "#009EE0",
+  "FDP"                   = "#FFED00",
+  "Die Linke"             = "#BE3075",
+  "Bündnis 90/Die Grünen" = "#1FA12D",
+  "Other parties"         = "#808080"
+)
+
+df_vote <- data_sm_relevance |>
+  filter(!is.na(age_group), !is.na(vote_intention_zweitstimme))
+
+plot_vote_intention <- ggplot(df_vote, aes(x = time_period, fill = vote_intention_zweitstimme)) +
+  geom_bar(position = "fill") +
+  facet_wrap(~ age_group, ncol = 1) +
+  scale_x_date(date_labels = "%b %Y", date_breaks = "6 months") +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_fill_manual(values = party_palette, name = "Vote intention") +
+  labs(x = "Survey period (start)", y = "Share")
+
+# plot_vote_intention
+```
+
+Furthermore, existing research demonstrates that populist rhetoric is widely utilised by political actors through social media [@mutascu_online_2025; @engesser_populism_2017; @mazzoleni_socially_2018]. Examples of elements of populist rhetoric can be examined across all parties. Research on populism in Italian facebook posts finds that populist rhetoric is endemic across party boundaries [@mazzoleni_socially_2018]. In a German context, a recent study on the utilisation of social media by political actors revealed that emotionally laden topics perform better than neutral policy discussions [@mersmann_digitization_2026].
+
+
+## The research gap
+
+While most studies focus on how social media is used to communicate to the public, fewer scholars aimed at the core of democratic discourse: the parliament. The parliament is a central institution of every democracy. After creating legislation, an essential function is to provide meaningful discussion open to the public to keep the electorate informed and able to hold politicians accountable. Previously, this discourse was filtered through the lense of media actors. With social media enabling politicians to circumvent this filter, shedding light on potential changes in discourse culture increases in relevance.
+
+Foregoing review of the literature established a link between the relevance of social media as political information medium and the rhetoric patterns in parliamentary speeches. It has opened a door to examine and understand rhetoric changes in parliament. However, examining this link in a serious manner requires data linking social media posts with speeches to parliamentary speeches. This work explores the relevance of social media only descriptively and focuses its inferential analysis on parliamentary speeches.
+
+# Theory
+
+The theoretical link relies not on the assumption that the electorate pays attention to speeches in the Bundestag directly. Referring back to the literature the electorate relies on other media as filtering instance to inform themselves [@blumer_third_1999]. This work instead assumes political actors prioritise social media to speak to the electorate [@lilleker_towards_2015]. To support their digital appearance, speakers might adjust their rhetoric to adhere to social media algorithms. Topics that do well on social media are those that fit well into the populist playbook. Addressing emotionally laden and controversial topics should be advantageous for the employment of rhetoric that establishes an us-vs-them mentality and critizises the elites.
+
+
+## Hypotheses
+
+Based on preceding literature review and theoretical considerations, following hypotheses are specified:
+
+Hypothesis 1: The scores for populist rhetoric in parliamentary speeches will increase over time.
+
+As social media becomes more relevant as a medium of political information, we would expect members of parliament to adjust their rhetoric to fit social media criteria.
+
+H2: Extreme parties in opposition should show the highest level of populist rhetoric with left-wing parties showing a higher emphasis on people-centrism and right-wing parties on anti-elitism.
+
+Anti-elitism is expected to be employed more intensively by right-wing parties, whereas left-wing parties should show a higher degree of people-centrism [@mudde_populist_2004].
+
+H3: Populist rhetoric should be higher for topics that are emotionally laden.
+
+If speakers care about their potential social media performance when delivering a speech, they should engage more in populist rhetoric when addressing emotionally laden topics.
+
+
+# Methodology
+
+It is still contested and context-dependent how populist rhetoric should be operationalised [@popping_measuring_2018]. Before the availability of transformer models, traditional natural language processing (NLP) often employed dictionary based methods like bag-of-words approaches. These approaches are easily reproducable but face significant challenges when it comes to complex lingual patterns. Populist rhetoric is full of various linguistic tricks which often are difficult to define and capture with dictionary based approaches. Furthermore, dictionaries designed to capture populism often differ and it is not clear when a dictionary is extensive [@pauwels_chapter_2017].
+
+This work instead relies on a transformer model called PopBERT. Transformer models offer a promising approach to successfully identify populist rhetoric by relying on word embeddings, which capture the context in which a word is used [@erhard_popbert_2025, @bonikowski_politics_2022].
+
+The model was trained and validated on Bundestag speeches from the 18th and 19th period by @erhard_popbert_2025. They employed a BERT (Bidirectional Encoder Representations from Transformers) model and fine-tuned it.
+
+Since the data collected for this paper has not been preprocessed like in @erhard_popbert_2025 the results cannot be interpreted as a straight continuation, but rather an employment of the model in a fitting, but different context.
+
+
+To understand the differences on how political topics are discussed in the Bundestag and on social media topic modelling is used. The topics are derived from unsupervised modelling and where it is appropriate, the same topics as in @mersmann_digitization_2026 are used to classify text.
+
+The corpus was collected using the official API of the "Dokumentations- und Informationssystems für Parlamentsmaterialien" (DIP) [@noauthor_deutscher_nodate]. After preprocessing, it consists of 23163 speeches and 1168085 sentences from the most recent complete Bundestag period between October 2021 and April 2023.
+
+Four logistic regression models are calculated to examine the effect of the specified key variables (table 2) on the predicted probability of a sentence falling into a populist dimension.
+
+Sentences of a speech that has been classified as mostly procedural were excluded from the analysis to prevent them from deflating populist rhetoric counts.
+
+
+```{r}
+#| label: tbl-results
+#| tbl-cap: "regression key variable table"
+
+keyvars <- data.frame("Variable" = c("Anti-Elitism", "People-Centrism", "Left-Wing Host-Ideology", "Right-Wing Host-Ideology", "Topic", "Time", "Party Affiliation", "Speaker"),
+"Type" = c("Ratio", "Ratio", "Ratio", "Ratio", "Ratio", "Interval", "Nominal", "Nominal"),
+"Operationalisation" = c("PopBERT score", "PopBERT score", "PopBERT score", "PopBERT score", "Topic proportions", "Monthly intervals", "Speaker party", "Speaker name"),
+"Theoretical function" = c("Dependent variable", "Dependent variable", "Dependent variable", "Dependent variable", "Independent variable", "Independent variable", "Control variable", "Control variable")) #TODO explain why time is continuous (change over time is expected to be linear and not bound by events)
+
+
+
+keyvars |>
+  kable(
+    booktabs = TRUE,
+    longtable = FALSE,
+    align = c("l", "l", "l", "l"),
+    caption = "Overview of key variables, their measurement, and theoretical roles",
+    escape = FALSE
+  ) |>
+  kable_styling(
+    latex_options = c("hold_position", "scale_down"),
+    font_size = 9,
+    full_width = TRUE
+  ) |>
+  column_spec(1, width = "3.5cm") %>%
+  column_spec(2, width = "2cm") %>%
+  column_spec(3, width = "8cm") %>%
+  column_spec(4, width = "4cm") %>%
+  row_spec(0, bold = TRUE)  # Bold headers
+
+
+```
+
+
+# Results and Discussion
+
+Of all 1177428 sentences classified by PopBERT, 9.4% contian anti-elitism, 2.3% contain people-centrism, 1.2% have a left-wing host ideology and 0.9% have a right-wing host ideology. [^These proportions are close to the results of @erhard_popbert_2025, p.8: "...we find 7.4% to contain antielitism, 2.1% people-centrism, 1.2% a left-wing host ideology, and 0.5% a right-wing host ideology."]
+
+
+
+## Hypothesis 1: Populist rhetoric over time
+
+Following graph explores the relevance of social media as a political information medium.
+
+```{r}
+#| label: fig-sm_over_time
+#| fig-cap: Political information sources over time
 #| fig-width: 12
 #| fig-height: 8
 # Compute share of each source within age group x wave
@@ -139,99 +276,273 @@ p1 <- ggplot(df_counts, aes(x = time_period, y = share, colour = media_info_sour
     subtitle = "Share of respondents per source, split by age groups",
     x        = "Survey period (start)",
     y        = "Share"
-  ) 
-  # theme(
-  #   plot.title       = element_text(face = "bold", size = 14),
-  #   plot.subtitle    = element_text(colour = "grey40", margin = margin(b = 8)),
-  #   legend.position  = "right",
-  #   axis.text.x      = element_text(angle = 30, hjust = 1),
-  #   panel.grid.minor = element_blank(),
-  #   strip.text       = element_text(face = "bold", size = 12)
-  # )
-# Save
-ggsave("plot_sources_by_agegroup.png", plot = p1, width = 11, height = 9, dpi = 150)
+  )
 p1
 
 ```
 
-As illustrated in figure 1, social media has established itself as the second most important source of political information during the times of the traffic light coalition. For young people between 18 and 29 it even is the most important source.
+Social media has established itself as the second most important source of political information during the times of the traffic light coalition. For young people between 18 and 29 it even is the most important source.
 
 ```{r}
-#| label: fig-vote-intention
-#| fig-cap: "Party vote intention by age group over time (GLES panel data)."
-#| fig-height: 10
+#| label: fig-sm-vs-populism
+#| fig-cap: "Mean populism rate in Bundestag speeches by dimension (solid coloured lines, left axis) and share of GLES respondents citing social media as primary political information source (grey dashed line, right axis), aggregated by quarter and survey wave respectively."
+#| fig-height: 6
 #| fig-width: 12
+sm_scale  <- fig_time_trends$sm_scale
+sm_offset <- fig_time_trends$sm_offset
 
-party_palette <- c(
-  "CDU/CSU"               = "#000000",
-  "SPD"                   = "#E3000F",
-  "AfD"                   = "#009EE0",
-  "FDP"                   = "#FFED00",
-  "Die Linke"             = "#BE3075",
-  "Bündnis 90/Die Grünen" = "#1FA12D",
-  "Other parties"         = "#808080"
+dim_palette <- c(
+  "Anti-Elitism"              = "#E3000F",
+  "People-Centrism"           = "#009900",
+  "Left-Wing Host-Ideology"   = "#BE3075",
+  "Right-Wing Host-Ideology"  = "#0072B2",
+  "Social media share"        = "grey50"
 )
 
-df_vote <- data_sm_relevance |>
-  filter(!is.na(age_group), !is.na(vote_intention_zweitstimme))
-
-ggplot(df_vote, aes(x = time_period, fill = vote_intention_zweitstimme)) +
-  geom_bar(position = "fill") +
-  facet_wrap(~ age_group, ncol = 1) +
+ggplot() +
+  geom_line(
+    data = fig_time_trends$pop,
+    aes(x = quarter, y = mean_score, colour = dim_label),
+    linewidth = 0.8
+  ) +
+  geom_line(
+    data = fig_time_trends$sm,
+    aes(x = time_period, y = sm_scaled, colour = "Social media share"),
+    linetype = "dashed", linewidth = 0.8
+  ) +
+  geom_point(
+    data = fig_time_trends$sm,
+    aes(x = time_period, y = sm_scaled, colour = "Social media share"),
+    size = 2
+  ) +
+  scale_colour_manual(
+    values = dim_palette,
+    breaks = names(dim_palette),
+    name   = NULL
+  ) +
+  scale_y_continuous(
+    name = "Mean populism rate",
+    sec.axis = sec_axis(
+      ~ (. - sm_offset) / sm_scale,
+      name   = "Social media share",
+      labels = scales::percent_format(accuracy = 1)
+    )
+  ) +
   scale_x_date(date_labels = "%b %Y", date_breaks = "6 months") +
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-  scale_fill_manual(values = party_palette, name = "Vote intention") +
-  labs(x = "Survey period (start)", y = "Share")
+  labs(x = NULL) +
+  theme(
+    axis.text.x     = element_text(angle = 30, hjust = 1),
+    legend.position = "bottom"
+  )
 ```
 
-TDOD: Work this into paper: IF FINDINGS SHOW AfD and LINKE rhetoric adjusts to be more populist for social media, this might be one explanation for their recent success within young voting groups.
-
-Furthermore, existing research demonstrates that populist rhetoric is widely utilised by political actors through social media [@mutascu_online_2025; @engesser_populism_2017; @mazzoleni_socially_2018]. Examples of elements of populist rhetoric can be examined across all parties. Research on populism on Italian facebook finds that populist rhetoric is endemic across party boundaries [@mazzoleni_socially_2018]. In a German context, a recent study on the utilisation of social media by political actors revealed that emotionally laden topics perform better than neutral policy discussions [@mersmann_digitization_2026].
-
-
-## The research gap
-
-While most studies focus on how social media is used to communicate to the public, fewer scholars aimed at the core of democratic discourse: the parliament. The parliament is a central institution of every democracy. After creating legislation, an essential function is to provide meaningful discussion open to the public to keep the electorate informed and able to hold politicians accountable. Previously, this discourse was filtered through the lense of media actors. With social media enabling politicians to circumvent this filter, shedding light on potential changes in discourse culture increases in relevance.
-
-Foregoing review of the literature established a link between the relevance of social media as political information medium and the rhetoric patterns in parliamentary speeches. It has opened a door to examine and understand rhetoric changes in parliament. However, examining this link in a serious manner requires data linking social media posts with speeches to parliamentary speeches. This work explores the relevance of social media only descriptively and focuses its inferential analysis on parliamentary speeches.
-
-# Theory
-
-The theoretical link relies not on the assumption that the electorate pays attention to speeches in the Bundestag directly. Referring back to the literature the electorate relies on other media as filtering instance to inform themselves [@blumler_third_1999]. This work instead assumes political actors prioritise social media to speak to the electorate [@lilleker_towards_2015]. To support their digital appearance, speakers might adjust their rhetoric to adhere to social media algorithms. Topics that do well on social media are those that fit well into the populist playbook. Addressing emotionally laden and controversial topics should be advantageous for the employment of rhetoric that establishes an us-vs-them mentality and critizises the elites.
+Figure 2 shows the increase in relevance of social media as political information medium and the mean populist scores over time.
+While every dimension of populism increases over time, the increase is most noticable for anti-elitism. This hints at how strong critizising rhetoric is a preferred tool of the populist repertoire.
 
 
-## Hypotheses
-
-Based on preceding literature review and theoretical considerations, following hypotheses are specified:
-
-Hypothesis 1: The scores for populist rhetoric in parliamentary speeches will increase over time.
-
-As social media becomes more relevant as a medium of political information, we would expect members of parliament to adjust their rhetoric to fit social media criteria.
-
-H2a: Parties in opposition are expected to use more anti-elitism rhetoric than governing parties.
-
-It is easier to critizise the ruling elites when you are in the opposition. We can expect them to use populist rhetoric to a greater extent as they do not have governing power.
-
-H2b: Extreme parties in opposition should show the highest level of populist rhetoric with left-wing parties showing a higher emphasis on people-centrism and right-wing parties on anti-elitism.
-
-Anti-elitism is expected to be employed more intensively by right-wing parties, whereas left-wing parties should show a higher degree of people-centrism [@mudde_populist_2004].
-
-H3: The scores for populist rhetoric increases when speakers adress topics that are emotionally laden.
-
-If speakers care about their potential social media performance when delivering a speech, they should engage more in populist rhetoric when addressing emotionally laden topics.
 
 
-# Methodology
+## Hypothesis 2: Extreme parties and high levels of populism 
 
-It is still contested and context-dependent how populist rhetoric should be operationalised [@popping_measuring_2018]. Before the availability of transformer models, traditional natural language processing (NLP) often employed dictionary based methods like bag-of-words approaches. These approaches are easily reproducable but face significant challenges when it comes to complex lingual patterns. Populist rhetoric is full of various linguistic tricks which often are difficult to define and capture with dictionary based approaches. Furthermore, dictionaries designed to capture populism often differ and it is not clear when a dictionary is extensive [@pauwels_chapter_2017].
 
-This work instead relies on a transformer model called PopBERT. Transformer models offer a promising approach to successfully identify populist rhetoric by relying on word embeddings, which capture the context in which a word is used [@erhard_popbert_2025, @bonikowski_politics_2022].
+```{r}
+#| label: fig-speaker-pop
+#| fig-cap: "Top 3 most populist speakers per party by mean PopBERT score across all four dimensions (minimum 100 classified sentences)."
+#| fig-height: 10
+#| fig-width: 12
+#| 
+ggplot(fig_speaker_pop, aes(x = mean_pop, y = Name, colour = Party)) +
+  geom_segment(
+    aes(x = 0, xend = mean_pop, y = Name, yend = Name),
+    colour = "grey78"
+  ) +
+  geom_point(size = 3) +
+  scale_colour_manual(values = bundestag_palette, guide = "none") +
+  facet_wrap(~ Party, scales = "free_y", ncol = 2) +
+  labs(x = "Mean populism score", y = NULL) +
+  theme(
+    strip.text  = element_text(face = "bold"),
+    axis.text.y = element_text(size = 8)
+  )
+```
 
-The model was trained and validated on Bundestag speeches from the 18th and 19th period by @erhard_popbert_2025. They employed a BERT (Bidirectional Encoder Representations from Transformers) model and fine-tuned it.
+
+
+
+Parties on the fringes of the political spectrum show higher amounts of populist rhetoric in accordance to the specified hypotheses.
+
+
+## Hypothesis 3:
+
+
+@mersmann_digitization_2026 have applied topic modelling to a corpus of social media posts of political parties and politicians and measured the performance of those posts. When modelling similar topics on the Bundestag speech corpus and measuring the level of populist rhetoric per topic, some parallels emerge. Social media postings that address emotional topics such as immigration policy, security issues, and climate change perform best (@mersmann_digitization_2026). These are also the topics that experience high levels of populist rhetoric in parliamentary debates, both on the anti-elitism and the people-centrism scales. Right wing populism is more/less prevalent than left wing populism.
+
+```{r}
+#| label: fig-topic-party-heatmap
+#| fig-cap: "Mean populism rate per topic and party, faceted by PopBERT dimension. Higher values indicate a greater share of sentences in that topic–party combination classified as populist."
+#| fig-height: 12
+#| fig-width: 14
+top5_labels <- fig_topic_party |>
+  group_by(dim_label) |>
+  slice_max(mean_score, n = 5) |>
+  ungroup() |>
+  mutate(label = scales::percent(mean_score, accuracy = 0.1))
+
+ggplot(fig_topic_party, aes(x = Party, y = topic_label, fill = mean_score)) +
+  geom_tile(colour = "white", linewidth = 0.4) +
+  geom_text(
+    data     = top5_labels,
+    aes(label = label),
+    colour   = "black",
+    size     = 2.5,
+    fontface = "bold"
+  ) +
+  scale_fill_gradient(
+    low    = "white",
+    high   = "#C0392B",
+    name   = "Mean\npopulism\nrate",
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  facet_wrap(~ dim_label, ncol = 2) +
+  labs(x = NULL, y = NULL) +
+  theme(
+    axis.text.x  = element_text(angle = 45, hjust = 1, size = 7),
+    axis.text.y  = element_text(size = 7),
+    strip.text   = element_text(face = "bold"),
+    panel.grid   = element_blank()
+  )
+```
+
+Emotionally charged topic like migration, environment or security show populist rhetoric but a clear distinction by topic across parties cannot be observed. The main driver for populist rhetoric seems to be the party affiliation. However, comparing host-ideologies reveals that ideological right-wing sentences do employ populist rhetoric more often for topics that are emotionally charged. Migration and Security exhibit the highest mean populism rates for that cluster.
+
+
+
+
+
+
+```{r}
+#| label: fig-keyness SPD
+#| fig-height: 20
+#| fig-width: 18
+
+x <- keyness_by_party[["SPD"]]
+textplot_keyness(x)
+
+```
+```{r}
+#| label: fig-keyness AfD
+#| fig-height: 20
+#| fig-width: 18
+
+x <- keyness_by_party[["AfD"]]
+textplot_keyness(x)
+
+```
+
+The keyness analysis reveals predictable results. The far-right AfD uses terms related to migration such as XXXX especially often while the far-left Die Linke uses terms related to social policy such as XXXX more often than other parties.
+
+
+
+
+```{r}
+#| label: tbl - logistic regression analysis
+#| tbl-cap: "Logistic Regression: Predictors of Populist Rhetoric in Bundestag Speeches (20th Period)"
+# regression analysis
+#
+# DV: binary _pred columns
+
+# bt_speeches_long is sentence-level, pivoted on the four _pred columns,
+# so each row is one sentence × one dimension, with score = 0/1.
+
+ct_ae <- coeftest(m_ae, vcov = model_vcovs$ae)
+ct_pc <- coeftest(m_pc, vcov = model_vcovs$pc)
+ct_lw <- coeftest(m_lw, vcov = model_vcovs$lw)
+ct_rw <- coeftest(m_rw, vcov = model_vcovs$rw)
+
+topic_coefs <- grep("^top_topic", rownames(ct_ae), value = TRUE)
+
+huxreg(
+  "Anti-Elitism"    = ct_ae,
+  "People-Centrism" = ct_pc,
+  "Left-Wing"       = ct_lw,
+  "Right-Wing"      = ct_rw,
+  # omit_coefs = topic_coefs,
+  statistics = character(0),
+  note = paste(
+    "Logistic regression coefficients (log-odds). Reference party: SPD.",
+    "Topic fixed effects included but not shown.",
+    "Clustered standard errors by speech_id in parentheses.",
+    paste0("N = ", nobs(m_ae), " (Anti-Elitism), ", nobs(m_pc), " (People-Centrism), ",
+           nobs(m_lw), " (Left-Wing), ", nobs(m_rw), " (Right-Wing) sentences."),
+    "* p < 0.1, ** p < 0.05, *** p < 0.01."
+  )
+) |>
+  set_label("tbl-regression") |>
+  set_font_size(9) |>
+  set_width(1)
+```
+
+
+## Limitations and future research
+
+There are several limitations to the conclusions reached in this paper. The most obvious and important one is that no inferential statistical test has been conducted to test for a relation between the main independent variable "relevance of social media" and the dependent variable "Populist sentiment in parliamentary speeches".
+
+It remains unclear if any descriptive parallels stem from the parliament following its function as a forum for political deliberation or if members of parliament adjust their rhetoric actively to establish a performance for social media.
+
+To test if the rhetoric truly changes due to social media, data on social media posts needs to be linked directly to speeches of the Bundestag. Future research could focus on the this possible relation. Here, it should be considered to use LLMs to identify populist rhetoric because they might perform better when it comes to identifying nuanced stances in different contexts.
+Qualitative methods, especially interviews of members of parliament would also be a valuable extension.
+
+The level of populism is evaluated by PopBERT on sentence instead of speech level. This poses two possible problems:
+
+First, the available data from the DPI API comes on speech level. Splitting the speeches into sentences may wrongly split sentences at spots where they should not be split and vice versa. Parliamentary often are no cleanly written texts. During a speech there might be interventions or slips of the tongue that lead to difficulties in determining the end and beginning of sentences.
+
+Second, classifying on speech level would prevent missing any context information. Speech-level analysis focuses on the classifying the whole text, whereas sentence-level analysis is normally employed when concentrating on short messages [@aliyu_comparative_2024]. Two sentences on their own might not be enough to identify populist rhetoric, but when they are taken together, they might prove to be populist.
+
+However, PopBERT is limited to 512 tokens per classification, which would require chunking speeches to avoid truncating them. This would keep more context information but the chunk might split mid-sentence which would cause again loss of information. Therefore, this work relied on classifying at sentence level, which is closest to the method used by @erhard_popbert_2025. Future research should employ a more resource intesive approach to enable classifying on speech instead of sentence level.
+
+Robustness checks for the transformer model have not been sufficiently conducted. It relies on the robustnesschecks of @erhard_popbert_2025 which have been conducted on data of the same institution in the same context but is older data. It is therefore not ensured that it performs the same on data that is more recent. This is problematic because this work explicitly aims to examine how populist rhetoric changes over time. Using a model trained on speeches from an earlier time period might reduce its performance.
+
+Finally, this work does not address the demand side of populist rhetoric on social media. To understand, first, in which cases populist rhetoric generates reach successfully, and second, in which cases digital success translates into political success, the demand side is a crucial, yet under-researched topic.
+
+# Conclusion
+
+This work explored language in the German parliament and developed an argument for social media as a driver of populist rhetoric.
+It was found that populist rhetoric is ........
+
+No conclusions about social media as a driver of populist rhetoric can be drawn from this work. The applied methods do not allow for inferential assumptions. However, the relevance of social media as one possible variable in explaining rhetoric shifts has been highlighted and future research on this topic would be worthwile.
+
+# NOTES
+
+Look for words that may come from social media culture
+
+look for complexity of speech, social media wants easy stuff, not complicated long sentences, attention span is getting shorter, etc.
+
+# Appendix
+
+## Appendix A: Use of Generative AI
+Every output of AI tools has been thouroughly checked before being implemented. No text passages generated by AI have been included.
+```{r}
+#| label: tbl-ai-tools
+#| tbl-cap: "Use of generative AI tools in this research paper"
+ai_appendix_table <- data.frame(
+  `AI Tool`    = c("Claude Code", "Claude Sonnet 4.6", "Github Copilot"),
+  Explanation  = c("Iterative conversation to double checked entire codebase to ensure data quality and adequate methodology.", "Creation of pipeline to pull Speech data from the DPI API", "used to autocomplete some sections of the code during topic analysis. Came up with parts of the keyword selection."),
+  `Prompt used` = c("for full conversation see prompts_log.md. Example prompts: 'check the code for my topic modelling and tell me if and what I should do differently. do not make any changes at this point.', 'Now check the whole thing again. Is the document level topic modelling correctly implemented? Will the pipeline work without errors or bugs? Are there methodological concerns you identify? Do not change anything, but tell me about it first.'\n", "'Create a pipeline that uses following api https://dip.bundestag.de/documents/informationsblatt_zur_dip_api.pdf to get all speeches from the beginning of the 20th period of the German Bundestag. If possible, include metadata for the date, speaker and party. Do this using either R or python.'\n", "None, code autocompletion"),
+  check.names  = FALSE
+)
+
+knitr::kable(ai_appendix_table, booktabs = TRUE) |>
+  kableExtra::kable_styling(latex_options = c("hold_position"), full_width = TRUE) |>
+  kableExtra::column_spec(1, width = "2.5cm") |>
+  kableExtra::column_spec(2, width = "5.5cm") |>
+  kableExtra::column_spec(3, width = "6cm")
+
+```
+## Appendix B: PopBERT performance
 
 ```{r}
 #| label: tbl-popbert-performance
-#| tbl-cap: "Performance of the PopBERT model on the 20% test set [@erhard_popbert_2025]."
+#| tbl-cap: "Performance of the PopBERT model on the test set [@erhard_popbert_2025]."
 
 popbert_perf <- data.frame(
   "Dimension"  = c("Anti-elitism", "People-centrism", "Left-wing ideology",
@@ -258,229 +569,9 @@ popbert_perf |>
   row_spec(4, hline_after = TRUE)
 ```
 
-To understand the differences on how political topics are discussed in the Bundestag and on social media topic modelling is used. The topics are derived from unsupervised modelling and where it is appropriate, the same topics as in @mersmann_digitization_2026 are used to classify text.
-
-The corpus was collected using the official API of the "Dokumentations- und Informationssystems für Parlamentsmaterialien" (DIP) [@noauthor_deutscher_nodate]. It consists of 23163 speeches and 1177428 sentences from the most recent complete Bundestag period between October 2021 and April 2023.
-
-Since this the data has not been preprocessed like in @erhard_popbert_2025 the results cannot be interpreted as a straight continuation, but rather an employment of the model in a fitting, but different context.
-
 ```{r}
 #| label: fig-modelfit
 #| fig-cap: "Log-likelihood over keyATM iterations, indicating model convergence."
 plot_modelfit(keyatm_model)
 ```
-
-Speeches classified as predominantly procedural by the topic model — such as voting announcements, formal introductions, and chairperson remarks — are excluded from the regression analysis. These texts do not constitute substantive political discourse, and their inclusion would systematically deflate populism scores in ways unrelated to rhetorical strategy. TODO: change this!!!
-
-Since emotionally laden topics should perform better on social media, the type of topic acts as a proxy for the relevance of social media in a regression model.
-
-
-```{r}
-#| label: tbl-results
-#| tbl-cap: "regression key variable table"
-
-keyvars <- data.frame("Variable" = c("Anti-Elitism", "People-Centrism", "Left-Wing Host-Ideology", "Right-Wing Host-Ideology", "Topic", "Time", "Party Affiliation", "Speaker"),
-"Type" = c("Ratio", "Ratio", "Ratio", "Ratio", "Ratio", "Interval", "Nominal", "Nominal"),
-"Operationalisation" = c("PopBERT score", "PopBERT score", "PopBERT score", "PopBERT score", "Topic proportions", "Monthly intervals", "Speaker party", "Speaker name"),
-"Theoretical function" = c("Dependent variable", "Dependent variable", "Dependent variable", "Dependent variable", "Independent variable", "Independent variable", "Control variable", "Control variable")) #TODO explain why time is continuous (change over time is expected to be linear and not bound by events)
-
-
-# Disclaimer: following code was created by perplexity
-
-
-keyvars |>
-  kable(
-    booktabs = TRUE,
-    longtable = FALSE,
-    align = c("l", "l", "l", "l"),
-    caption = "Overview of key variables, their measurement, and theoretical roles",
-    escape = FALSE
-  ) |>
-  kable_styling(
-    latex_options = c("hold_position", "scale_down"),
-    font_size = 9,
-    full_width = FALSE
-  ) |>
-  column_spec(1, width = "3.5cm") %>%
-  column_spec(2, width = "2cm") %>%
-  column_spec(3, width = "8cm") %>%
-  column_spec(4, width = "4cm") %>%
-  row_spec(0, bold = TRUE)  # Bold headers
-
-
-```
-
-
-# Results and Discussion
-
-Of all 1177428 sentences classified by PopBERT, XX% contian anti-elitism, XX% contain people-centrism, XX% have a left-wing host ideology and XX% have a right-wing host ideology.
-
-Over time, the amount of populist rhetoric during the 20th period of the German Bundestag increased/decreased in the dimensions XXX and increased/decreased in the dimensions XXX.
-
-
-Parties on the ends of the political spectrum show higher amounts of populist rhetoric in accordance to the specified hypotheses. They 
-
-## Rhetoric in the Bundestag VS Rhetoric on Social media
-
-@mersmann_digitization_2026 have applied topic modelling to a corpus of social media posts of political parties and politicians and measured the performance of those posts. When modelling similar topics on the Bundestag speech corpus and measuring the level of populist rhetoric per topic, some parallels emerge. Social media postings that address emotional topics such as immigration policy, security issues, and climate change perform best (@mersmann_digitization_2026). These are also the topics that experience high levels of populist rhetoric in parliamentary debates, both on the anti-elitism and the people-centrism scales. Right wing populism is more/less prevalent than left wing populism.
-
-```{r fig.width=14, fig.height=10}
-#| label: fig-2
-#| fig-cap: Populist sentiment
-
-populist_plot <- ggplot(bt_speeches_long, aes(x = Date, y = score, color = Party)) +
-  
-  geom_point(alpha = 0.25, size = 0.8) +
-  
-  geom_smooth(
-    method = "lm",
-    se     = FALSE,
-    linewidth = 1
-  ) +
-  
-  facet_wrap(~ populist_dimension, ncol = 2) +
- 
-  scale_x_date(
-  date_breaks = "3 months",
-  date_labels = "%m/%Y"
-) +
-  
-  labs(
-    title    = "Populist Rhetoric in Bundestag Speeches Over Time",
-    subtitle = "OLS regression line with 95% confidence interval",
-    x        = NULL,
-    y        = "Populist classification",
-    caption  = "Each point = one sentence"
-  ) +
-  
-  theme_minimal(base_size = 13) +
-  theme(
-    # Titles
-    plot.title       = element_text(face = "bold", size = 15, margin = margin(b = 4)),
-    plot.subtitle    = element_text(color = "grey45", size = 11, margin = margin(b = 12)),
-    plot.caption     = element_text(color = "grey55", size = 9),
-    
-    # Facet labels
-    strip.text       = element_text(face = "bold", size = 11),
-    strip.background = element_rect(fill = "grey95", color = NA),
-    
-    # Grid: keep horizontal only for cleanliness
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor   = element_blank(),
-    panel.spacing      = unit(1.2, "lines"),
-    
-    # Axis
-    axis.text.x  = element_text(angle = 30, hjust = 1, size = 9),
-    axis.text.y  = element_text(size = 9),
-    axis.title.y = element_text(margin = margin(r = 8)),
-    axis.ticks.x       = element_line(color = "grey40", linewidth = 0.4),
-    
-    plot.margin  = margin(12, 16, 12, 12)
-  )
-
-# populist_plot |> ggsave(filename="populist_classified_overtime.png")
-
-```
-
-Emotionally charged topic like immigration, environment or security show populist rhetoric more often.
-This points out parallels between parliamentary rhetoric and political discourse on social media. However, a  methodological link between social media posts and parliamentary speeches is still missing. It remains unclear if these parallels stem from the parliament following its function as a forum for political deliberation or if members of parliament adjust their rhetoric actively to establish a performance for social media.
-
-
-
-```{r}
-#| label: fig-keyness SPD
-#| fig-height: 20
-#| fig-width: 18
-
-x <- keyness_by_party[["SPD"]]
-textplot_keyness(x)
-
-```
-```{r}
-#| label: fig-keyness AfD
-#| fig-height: 20
-#| fig-width: 18
-
-x <- keyness_by_party[["AfD"]]
-textplot_keyness(x)
-
-```
-
-The keyness analysis reveals predictable results. The far-right AfD uses terms related to migration such as XXXX especially often while the far-left Die Linke uses terms related to social policy such as XXXX more often than other parties.
-
-```{r}
-#| label: fig-topic proportions
-
-
-p <- ggplot(bt_speeches_long, aes(x=top_topic, y=populist_mean)) +
-  geom_point()
-# p
-
-```
-
-
-```{r}
-# regression analysis
-#
-# DV: binary _pred columns
-
-# bt_speeches_long is sentence-level, pivoted on the four _pred columns,
-# so each row is one sentence × one dimension, with score = 0/1.
-
-ct_ae <- coeftest(m_ae, vcov = model_vcovs$ae)
-ct_pc <- coeftest(m_pc, vcov = model_vcovs$pc)
-ct_lw <- coeftest(m_lw, vcov = model_vcovs$lw)
-ct_rw <- coeftest(m_rw, vcov = model_vcovs$rw)
-
-topic_coefs <- grep("^top_topic", rownames(ct_ae), value = TRUE)
-
-huxreg(
-  "Anti-Elitism"    = ct_ae,
-  "People-Centrism" = ct_pc,
-  "Left-Wing"       = ct_lw,
-  "Right-Wing"      = ct_rw,
-  omit_coefs = topic_coefs,
-  statistics = character(0),
-  note = paste(
-    "Logistic regression coefficients (log-odds). Reference party: SPD.",
-    "Topic fixed effects included but not shown.",
-    "Clustered standard errors by speech_id in parentheses.",
-    paste0("N = ", nobs(m_ae), " (Anti-Elitism), ", nobs(m_pc), " (People-Centrism), ",
-           nobs(m_lw), " (Left-Wing), ", nobs(m_rw), " (Right-Wing) sentences."),
-    "* p < 0.1, ** p < 0.05, *** p < 0.01."
-  )
-) |>
-  set_label("tbl-regression") |>
-  set_caption("Logistic Regression: Predictors of Populist Rhetoric in Bundestag Speeches (20th Period)") |>
-  set_font_size(9) |>
-  set_width(1)
-```
-
-
-## Limitations
-
-There are several limitations to the conclusions reached in this paper. The most obvious and important one is that no inferential statistical test has been conducted to test for a relation between the main independent variable "relevance of social media" and the dependent variable "Populist sentiment in parliamentary speeches". To test if the rhetoric truly changes due to social media, data on social media posts needs to be linked directly to speeches of the Bundestag. Future research could focus on the this possible relation. Qualitative methods, especially interviews of members of parliament would be a valuable extension.
-
-The level of populism is evaluated by PopBERT on sentence instead of speech level. This poses two possible problems:
-
-First, the available data from the DPI API comes on speech level. Splitting the speeches into sentences may wrongly split sentences at spots where they should not be split and vice versa. Parliamentary often are no cleanly written texts. During a speech there might be interventions or slips of the tongue that lead to difficulties in determining the end and beginning of sentences.
-Second, classifying on speech level would prevent missing any context information. Speech-level analysis focuses on the classifying the whole text, whereas sentence-level analysis is normally employed when concentrating on short messages [@aliyu_comparative_2024]. Two sentences on their own might not be enough to identify populist rhetoric, but when they are taken together, they might prove to be populist.
-
-However, the PopBERT is limited to 512 tokens per classification, which would require chunking speeches to avoid truncating them. This would keep more context information but the chunk might split mid-sentence which would cause again loss of information. Therefore, this work relied on classifying at sentence level, which is closest to the method used by @erhard_popbert_2025. Future research should employ a more resource intesive approach to enable classifying on speech instead of sentence level.
-
-Robustness checks for the transformer model have not been sufficiently conducted. It relies on the robustnesschecks of @erhard_popbert_2025 which have been conducted on data of the same institution in the same context but is older data. It is therefore not ensured that it performs the same on data that is more recent. This is problematic because this work explicitly aims to examine how populist rhetoric changes over time. Using a model trained on speeches from an earlier time period might reduce its performance.
-
-Finally, this work does not address the demand side of populist/popular rhetoric on social media. To understand, first, in which cases populist/popular rhetoric generates reach successfully, and second, in which cases digital success translates into political success, the demand side is a crucial, yet under-researched topic.
-
-# Conclusion
-
-For future research, it should be considered to use LLMs to identify populist rhetoric because they perform better when it comes to identifying nuanced stances. 
-Future work on the utilisation of social media by political actors should take into consideration not only accounts officially representing a specific political actor. Other accounts have considerably more influence than the political accounts themselves. Here, whole networks should be the subject of research to.
-Also worth noting, the speech corpus of SpeakGer turned out to be not suitable for by party or by speaker analysis due to the often wrongly attributed speech segments.
-
-# NOTES
-
-Look for words that may come from social media culture
-
-look for complexity of speech, social media wants easy stuff, not complicated long sentences, attention span is getting shorter, etc.
 
