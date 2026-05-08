@@ -2,7 +2,9 @@
 title: The New Sound of Politics
 author:
   - name: Robert Bowien
-    affiliation: University College Dublin
+  - affiliation: University College Dublin
+  - module: Quantitative text analysis
+  - coordinator: Prof. Dr. Stefan Müller
     roles: writing
     corresponding: true
 bibliography: references.bib
@@ -137,8 +139,6 @@ This work instead relies on a transformer model called PopBERT. Transformer mode
 
 The model was trained and validated on Bundestag speeches from the 18th and 19th period by @erhard_popbert_2025. They employed a BERT (Bidirectional Encoder Representations from Transformers) model and fine-tuned it.
 
-Since the data collected for this paper has not been preprocessed like in @erhard_popbert_2025 the results cannot be interpreted as a straight continuation, but rather an employment of the model in a fitting, but different context.
-
 To understand the differences on how political topics are discussed in the Bundestag topic modelling is used. The topics are derived from iterated unsupervised modelling and where it is appropriate, the same topics as in @mersmann_digitization_2026 have been adopted.
 
 The corpus was collected using the official API of the "Dokumentations- und Informationssystems für Parlamentsmaterialien" (DIP) [@noauthor_deutscher_nodate]. After preprocessing, it consists of 23163 speeches and 1168085 sentences from the most recent complete Bundestag period between October 2021 and April 2023.
@@ -162,7 +162,6 @@ keyvars |>
     booktabs = TRUE,
     longtable = FALSE,
     align = c("l", "l", "l", "l"),
-    caption = "Overview of key variables, their measurement, and theoretical roles",
     escape = FALSE
   ) |>
   kable_styling(
@@ -181,7 +180,7 @@ keyvars |>
 
 # Results and Discussion
 
-Of all 1177428 sentences classified by PopBERT, 9.4% contian anti-elitism, 2.3% contain people-centrism, 1.2% have a left-wing host ideology and 0.9% have a right-wing host ideology. [\^These proportions are close to the results of @erhard_popbert_2025, p.8: "...we find 7.4% to contain antielitism, 2.1% people-centrism, 1.2% a left-wing host ideology, and 0.5% a right-wing host ideology."]
+Of all 1177428 sentences classified by PopBERT, 9.4% contian anti-elitism, 2.3% contain people-centrism, 1.2% have a left-wing host ideology and 0.9% have a right-wing host ideology.^[These proportions are close to the results of @erhard_popbert_2025, p.8: "...we find 7.4% to contain antielitism, 2.1% people-centrism, 1.2% a left-wing host ideology, and 0.5% a right-wing host ideology."]
 
 ## Hypothesis 1
 
@@ -252,10 +251,10 @@ sm_scale  <- fig_time_trends$sm_scale
 sm_offset <- fig_time_trends$sm_offset
 
 dim_palette <- c(
-  "Anti-Elitism"              = "#E3000F",
-  "People-Centrism"           = "#009900",
-  "Left-Wing Host-Ideology"   = "#BE3075",
-  "Right-Wing Host-Ideology"  = "#0072B2",
+  "Anti-Elitism"              = "#E69F00",
+  "People-Centrism"           = "#009E73",
+  "Left-Wing Host-Ideology"   = "#56B4E9",
+  "Right-Wing Host-Ideology"  = "#F0E442",
   "Social media share"        = "grey50"
 )
 
@@ -444,9 +443,9 @@ suppressWarnings(huxreg(
 )) |>
   set_caption("Mixed-Effects Logistic Regression: Predictors of Populist Rhetoric in Bundestag Speeches (20th Period)") |>
   set_label("tbl-regression") |>
+  set_tabular_environment("tabular") |>
   set_font_size(8) |>
-  set_width(1) |>
-  set_tabular_environment("longtable")
+  set_width(1)
 
 ```
 
@@ -522,8 +521,8 @@ ai_appendix_table <- data.frame(
   check.names  = FALSE
 )
 
-knitr::kable(ai_appendix_table, booktabs = TRUE) |>
-  kableExtra::kable_styling(latex_options = c("HOLD_position"), full_width = TRUE) |>
+knitr::kable(ai_appendix_table, booktabs = TRUE, longtable = TRUE) |>
+  kableExtra::kable_styling(full_width = TRUE) |>
   kableExtra::column_spec(1, width = "2.5cm") |>
   kableExtra::column_spec(2, width = "5.5cm") |>
   kableExtra::column_spec(3, width = "6cm")
@@ -547,15 +546,14 @@ popbert_perf <- data.frame(
 popbert_perf |>
   kable(
     booktabs  = TRUE,
-    longtable = FALSE,
+    longtable = TRUE,
     align     = c("l", "c", "c", "c"),
     escape    = FALSE,
     digits    = 2
   ) |>
   kable_styling(
-    latex_options = c("HOLD_position"),
-    font_size     = 9,
-    full_width    = FALSE
+    font_size  = 9,
+    full_width = FALSE
   ) |>
   row_spec(0, bold = TRUE) |>
   row_spec(4, hline_after = TRUE)
