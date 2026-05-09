@@ -3,19 +3,19 @@ title: The New Sound of Politics
 author:
   - name: Robert Bowien
   - affiliation: University College Dublin
-  - module: Quantitative text analysis
-  - coordinator: Prof. Dr. Stefan Müller
     roles: writing
     corresponding: true
 bibliography: references.bib
 fig-pos: "H"
-tbl-pos: "H"
 execute:
   echo: false
 output:
   pdf_document:
     extra_dependencies: ["longtable", "float"]
     toc: true
+header-includes:
+  - \usepackage{booktabs}
+  - \usepackage{threeparttablex}
 ---
 
 ```{r}
@@ -58,13 +58,13 @@ bundestag_palette <- c(
 
 theme_set(theme_minimal())
 options(knitr.table.format = "latex")
-options(huxtable.latex_float = "H")
+options(huxtable.latex_float = NULL)  # longtable is non-floating; must not be inside a float
 
 ```
 
 # Abstract
 
-This work explores populist parliamentary rhetoric in the context of social media as a potential influental factor. It is theorised that politicians aim to increase their reach on social media as the electorate increasingly obtain political information from this medium. This relation is explored descriptevely and inferentially. PopBERT is employed to classify populist rhetoric and topic modelling identifies prevalent topics in speeches. A Logistic generalized linear mixed effects regression model is used to estimate effects of time, topic, and party affiliation on the amount of populist rhetoric. While no inferential conclusions can be drawn for the influence on social media on parliamentary rhetoric, party affiliation and specific topics are found to have significant effects.
+This work explores populist parliamentary rhetoric in the context of social media as a potential influental factor. It is theorised that politicians aim to increase their reach on social media as the electorate increasingly obtain political information from this medium. This relation is explored descriptevely and, where possible, inferentially. The transformer model PopBERT is employed to classify populist rhetoric. Anti-elitism is the most prevalent among the examined populist dimensions. Topic modelling identifies prevalent topics in speeches. A mixed effects logistic regression model is used to estimate effects of time, topic, and party affiliation on the amount of populist rhetoric. While no inferential conclusions can be drawn for the influence on social media on parliamentary rhetoric, party affiliation and emotionally laden topics are found to have significant effects.
 
 
 # Introduction
@@ -332,7 +332,7 @@ Figure 3 yields expected results. Parties on the fringes of the political spectr
 
 ## Hypothesis 3:
 
-@mersmann_digitization_2026 have applied topic modelling to a corpus of social media posts of political parties and politicians and measured the performance of those posts. When modelling similar topics on the Bundestag speech corpus and measuring the level of populist rhetoric per topic, some parallels emerge. Social media postings that address emotional topics such as immigration policy, security issues, and climate change perform best (@mersmann_digitization_2026). These are also the topics that experience high levels of populist rhetoric in parliamentary debates, both on the anti-elitism and the people-centrism scales. Right wing populism is more/less prevalent than left wing populism.
+@mersmann_digitization_2026 have applied topic modelling to a corpus of social media posts of political parties and politicians and measured the performance of those posts. When modelling similar topics on the Bundestag speech corpus and measuring the level of populist rhetoric per topic, some parallels emerge.
 
 ```{r}
 #| label: fig-topic-party-heatmap
@@ -370,84 +370,13 @@ ggplot(fig_topic_party, aes(x = Party, y = topic_label, fill = mean_score)) +
   )
 ```
 
-Figure 4 supports H3. The main driver for populist rhetoric seems to be the party affiliation. However, some topics seem to funnel more populist rhetoric than others. For Anti-Elitism, party affairs show high levels of populism, especially among parties at the political fringes (AfD, Die Linke, BSW). For people-centrism, migration exhibits the highest levels of populist language across party boundaries. Right-wing sentences employ populist rhetoric more often for topics that are emotionally charged. Migration and Security exhibit the highest mean populism rates for that cluster. Left-wing sentences seem to be dominated by party affiliation. Die Linke holds most of the top 10 percentages here.
-
+The main driver for populist rhetoric seems to be the party affiliation. However, some topics seem to funnel more populist rhetoric than others. For Anti-Elitism, party affairs show high levels of populism, especially among parties at the political fringes (AfD, Die Linke, BSW). For people-centrism, migration exhibits the highest levels of populist language across party boundaries. Right-wing sentences employ populist rhetoric more often for topics that are emotionally charged. Migration and Security exhibit the highest mean populism rates for that cluster. These are also among the topic @mersmann_digitization_2026 identify as well performing on social media. Left-wing sentences seem to be dominated by party affiliation. Die Linke holds most of the top 10 percentages here.
 
 A keyness analysis (see appendix) reveals no surprising results. The far-right AfD uses nationalistic language and terms related to the people such as "bürger" or "deutschland" more often while the far-left Die Linke uses terms related to low-income and social policies such aus "mietwucher" and "resilienzbonus" more often than other parties.
 
 ## Regression analysis
 
-```{r}
-#| label: reg-table
-
-# summary()$coefficients gives fixed-effects only with model-based SEs.
-# Wrapping as coeftest class lets huxreg dispatch via broom::tidy.coeftest.
-# lmtest::coeftest() itself fails on glmerMod because coef.merMod returns
-# all conditional modes (~700 speakers), making diag() hit R's vector length limit.
-fe_coeftest <- function(m) {
-  cf <- summary(m)$coefficients
-  class(cf) <- c("coeftest", "matrix")
-  cf
-}
-ct_ae <- fe_coeftest(m_ae)
-ct_pc <- fe_coeftest(m_pc)
-ct_lw <- fe_coeftest(m_lw)
-ct_rw <- fe_coeftest(m_rw)
-
-# Keep only topic fixed effects significant at p < 0.01 in at least one dimension
-all_topic_coefs <- grep("^top_topic", rownames(ct_ae), value = TRUE)
-p_mat <- cbind(ct_ae[all_topic_coefs, "Pr(>|z|)"], ct_pc[all_topic_coefs, "Pr(>|z|)"],
-               ct_lw[all_topic_coefs, "Pr(>|z|)"], ct_rw[all_topic_coefs, "Pr(>|z|)"])
-sig_topics <- all_topic_coefs[apply(p_mat, 1, min, na.rm = TRUE) < 0.01]
-
-sig_topic_labels <- vapply(sig_topics, function(tc) {
-  lbl <- topic_label_map[tc]
-  if (is.na(lbl)) tc else unname(lbl)
-}, character(1))
-
-party_coefs <- grep("^Party", rownames(ct_ae), value = TRUE)
-coef_names <- c(
-  "(Intercept)"     = "(Intercept)",
-  "Date trend (SD)" = "date_num",
-  setNames(party_coefs, sub("^Party", "", party_coefs)),
-  setNames(sig_topics, sig_topic_labels)
-)
-
-# ICC = σ²_speaker / (σ²_speaker + π²/3); π²/3 is the logistic level-1 variance
-icc_fmt <- function(m) {
-  v <- as.numeric(VarCorr(m)$Name)
-  sprintf("%.3f", v / (v + pi^2 / 3))
-}
-
-suppressWarnings(huxreg(
-  "Anti-Elitism"    = ct_ae,
-  "People-Centrism" = ct_pc,
-  "Left-Wing"       = ct_lw,
-  "Right-Wing"      = ct_rw,
-  coefs      = coef_names,
-  statistics = character(0),
-  note = paste(
-    "Mixed-effects logistic regression coefficients (log-odds).",
-    "Reference party: SPD.",
-    "Reference topic: Agriculture.",
-    "Random intercept by speaker; model-based standard errors in parentheses.",
-    "Date trend standardised (coefficient = change per SD of time).",
-    "Only topic fixed effects significant at p < 0.01 in at least one dimension are shown.",
-    "Only sentences that have been assigned a substantive topic have been included: ",
-    paste0("N = ", nobs(m_ae), " / ", nobs(m_pc), " / ", nobs(m_lw), " / ", nobs(m_rw),
-           " sentences (AE / PC / LW / RW)."),
-    paste0("ICC (speaker) = ", icc_fmt(m_ae), " / ", icc_fmt(m_pc), " / ",
-           icc_fmt(m_lw), " / ", icc_fmt(m_rw), " (AE / PC / LW / RW)."),
-    "* p < 0.1, ** p < 0.05, *** p < 0.01."
-  )
-)) |>
-  set_caption("Mixed-Effects Logistic Regression: Predictors of Populist Rhetoric in Bundestag Speeches (20th Period)") |>
-  set_label("tbl-regression") |>
-  set_tabular_environment("tabular") |>
-  set_font_size(8) |>
-  set_width(1)
-
-```
+The regression table can be found in the appendix.
 
 The intra class correlation for the model is 0.147 for anti-elitism, 0.094 for people-centrism, 0.18 for left-wing host-ideology, and 0.207 for right-wing host-ideology, meaning after controlling for all other variables in the model, 14.7% / 9.4% / 18% / 20.7% of the difference in the outcome remain due to the variance in the speakers.
 
@@ -505,6 +434,8 @@ However, PopBERT is limited to 512 tokens per classification, which would requir
 ::: {#refs}
 :::
 
+\clearpage
+
 # Appendix
 
 ## Appendix A: Use of Generative AI
@@ -521,8 +452,8 @@ ai_appendix_table <- data.frame(
   check.names  = FALSE
 )
 
-knitr::kable(ai_appendix_table, booktabs = TRUE, longtable = TRUE) |>
-  kableExtra::kable_styling(full_width = TRUE) |>
+knitr::kable(ai_appendix_table, booktabs = TRUE) |>
+  kableExtra::kable_styling(latex_options = c("HOLD_position"), full_width = TRUE) |>
   kableExtra::column_spec(1, width = "2.5cm") |>
   kableExtra::column_spec(2, width = "5.5cm") |>
   kableExtra::column_spec(3, width = "6cm")
@@ -546,14 +477,15 @@ popbert_perf <- data.frame(
 popbert_perf |>
   kable(
     booktabs  = TRUE,
-    longtable = TRUE,
+    longtable = FALSE,
     align     = c("l", "c", "c", "c"),
     escape    = FALSE,
     digits    = 2
   ) |>
   kable_styling(
-    font_size  = 9,
-    full_width = FALSE
+    latex_options = c("HOLD_position"),
+    font_size     = 9,
+    full_width    = FALSE
   ) |>
   row_spec(0, bold = TRUE) |>
   row_spec(4, hline_after = TRUE)
@@ -567,6 +499,7 @@ plot_modelfit(keyatm_model)
 
 ## Appendix C: keyness analysis
 
+
 ```{r}
 #| label: fig-keyness SPD
 #| fig-height: 20
@@ -576,6 +509,7 @@ x <- keyness_by_party[["SPD"]]
 textplot_keyness(x)
 
 ```
+
 
 ```{r}
 #| label: fig-keyness Linke
@@ -587,6 +521,7 @@ textplot_keyness(x)
 
 ```
 
+
 ```{r}
 #| label: fig-keyness CDU/CSU
 #| fig-height: 20
@@ -596,6 +531,7 @@ x <- keyness_by_party[["CDU/CSU"]]
 textplot_keyness(x)
 
 ```
+
 
 ```{r}
 #| label: fig-keyness B90/Grüne
@@ -608,6 +544,7 @@ names(keyness_by_party)
  
 ```
 
+
 ```{r}
 #| label: fig-keyness AfD
 #| fig-height: 20
@@ -617,6 +554,7 @@ x <- keyness_by_party[["AfD"]]
 textplot_keyness(x)
 
 ```
+
 
 ```{r}
 #| label: fig-keyness BSW
@@ -628,6 +566,7 @@ textplot_keyness(x)
 
 ```
 
+
 ```{r}
 #| label: fig-keyness fraktionslos
 #| fig-height: 20
@@ -636,6 +575,17 @@ textplot_keyness(x)
 x <- keyness_by_party[["fraktionslos"]]
 textplot_keyness(x)
 
+```
+
+
+## Appendix D: Regression results
+
+
+```{r}
+#| echo: false
+#| results: asis
+#| cache: false
+cat(readLines("regression_table.tex"), sep = "\n")
 ```
 
 

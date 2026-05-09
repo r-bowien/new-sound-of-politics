@@ -108,6 +108,7 @@ make_subset <- function(dim_name) {
   df           <- bt_speeches_long[bt_speeches_long$populist_dimension == dim_name, ]
   df           <- df[!is.na(df$top_topic), ]                          # drop DFM-excluded speeches
   df           <- df[!grepl("^Other", df$top_topic_name), ]           # drop residual keyATM topics
+  df           <- df[!is.na(df$Party) & df$Party != "", ]             # drop unaffiliated / empty party
   df$date_num  <- scale(as.numeric(df$Date))[, 1]  # standardise: fixes large-eigenvalue warning from glmer
   df$Party     <- relevel(factor(df$Party), ref = "SPD")
   df$top_topic <- factor(df$top_topic)                                 # droplevels implicit in factor()
@@ -258,4 +259,109 @@ sm_over_time$sm_scaled <- sm_over_time$sm_share * sm_scale + sm_offset
 saveRDS(
   list(sm = sm_over_time, pop = pop_over_time, sm_scale = sm_scale, sm_offset = sm_offset),
   "data/fig_time_trends.rds"
+)
+
+# --- Appendix D: Regression table saved as .tex (kable longtable, no float wrapper) ---
+library(knitr)
+library(kableExtra)
+
+topic_label_map <- setNames(topic_coef_labels$nice_name, topic_coef_labels$coef_name)
+
+fe_coeftest <- function(m) {
+  cf <- summary(m)$coefficients
+  class(cf) <- c("coeftest", "matrix")
+  cf
+}
+ct_ae <- fe_coeftest(m_ae)
+ct_pc <- fe_coeftest(m_pc)
+ct_lw <- fe_coeftest(m_lw)
+ct_rw <- fe_coeftest(m_rw)
+
+all_topic_coefs <- grep("^top_topic", rownames(ct_ae), value = TRUE)
+p_mat <- cbind(
+  ct_ae[all_topic_coefs, "Pr(>|z|)"], ct_pc[all_topic_coefs, "Pr(>|z|)"],
+  ct_lw[all_topic_coefs, "Pr(>|z|)"], ct_rw[all_topic_coefs, "Pr(>|z|)"]
+)
+sig_topics <- all_topic_coefs[apply(p_mat, 1, min, na.rm = TRUE) < 0.01]
+sig_topic_labels <- vapply(sig_topics, function(tc) {
+  lbl <- topic_label_map[tc]; if (is.na(lbl)) tc else unname(lbl)
+}, character(1))
+
+party_coefs <- grep("^Party", rownames(ct_ae), value = TRUE)
+coef_names <- c(
+  "(Intercept)"     = "(Intercept)",
+  "Date trend (SD)" = "date_num",
+  setNames(party_coefs, sub("^Party", "", party_coefs)),
+  setNames(sig_topics, sig_topic_labels)
+)
+
+icc_fmt <- function(m) {
+  v <- as.numeric(VarCorr(m)$Name)
+  sprintf("%.3f", v / (v + pi^2 / 3))
+}
+
+# Build two-row-per-coefficient data frame using original ct matrices directly.
+# Look up each coefficient by its model name; show "" when a coefficient is absent
+# from a particular model (can happen for topic dummies with no positive cases).
+add_stars <- function(est, pval) {
+  s <- ifelse(pval < 0.01, "***", ifelse(pval < 0.05, "**", ifelse(pval < 0.1, "*", "")))
+  paste0(sprintf("%.3f", est), s)
+}
+
+ct_orig   <- list(ct_ae, ct_pc, ct_lw, ct_rw)
+coef_disp <- names(coef_names)    # display labels (row headers in table)
+coef_mod  <- unname(coef_names)   # model coefficient names (rownames in ct matrices)
+
+tbl_rows <- do.call(rbind, lapply(seq_along(coef_disp), function(i) {
+  dn <- coef_disp[i]
+  cn <- coef_mod[i]
+  est_r <- c(dn, sapply(ct_orig, function(ct) {
+    if (cn %in% rownames(ct)) add_stars(ct[cn, "Estimate"], ct[cn, "Pr(>|z|)"]) else ""
+  }))
+  se_r  <- c("",  sapply(ct_orig, function(ct) {
+    if (cn %in% rownames(ct)) paste0("(", sprintf("%.3f", ct[cn, "Std. Error"]), ")") else ""
+  }))
+  rbind(est_r, se_r)
+}))
+tbl_df <- as.data.frame(tbl_rows, stringsAsFactors = FALSE)
+colnames(tbl_df) <- c("", "Anti-Elitism", "People-Centrism", "Left-Wing", "Right-Wing")
+rownames(tbl_df) <- NULL
+tbl_df[[1]] <- gsub("&", "\\\\&", tbl_df[[1]])
+
+tbl_note <- paste(
+  "Mixed-effects logistic regression coefficients (log-odds).",
+  "Reference party: SPD. Reference topic: Agriculture.",
+  "Random intercept by speaker; model-based standard errors in parentheses.",
+  "Date trend standardised (coefficient = change per SD of time).",
+  "Only topic fixed effects significant at p < 0.01 in at least one dimension are shown.",
+  "Only sentences assigned a substantive topic are included.",
+  paste0("N = ", nobs(m_ae), " / ", nobs(m_pc), " / ", nobs(m_lw), " / ", nobs(m_rw), " (AE / PC / LW / RW)."),
+  paste0("ICC (speaker) = ", icc_fmt(m_ae), " / ", icc_fmt(m_pc), " / ", icc_fmt(m_lw), " / ", icc_fmt(m_rw), " (AE / PC / LW / RW)."),
+  "* p < 0.1, ** p < 0.05, *** p < 0.01."
+)
+
+tbl_latex <- knitr::kable(
+  tbl_df,
+  format    = "latex",
+  booktabs  = TRUE,
+  longtable = TRUE,
+  escape    = FALSE,
+  linesep   = "",
+  caption   = "Mixed-Effects Logistic Regression: Predictors of Populist Rhetoric in Bundestag Speeches (20th Period)"
+) |>
+  kableExtra::kable_styling(
+    font_size     = 8,
+    latex_options = "repeat_header"
+  ) |>
+  kableExtra::column_spec(1, width = "6cm") |>
+  kableExtra::footnote(
+    general        = tbl_note,
+    threeparttable = TRUE,
+    escape         = FALSE,
+    general_title  = ""
+  )
+
+writeLines(
+  c("```{=latex}", as.character(tbl_latex), "```"),
+  "research paper/regression_table.tex"
 )
