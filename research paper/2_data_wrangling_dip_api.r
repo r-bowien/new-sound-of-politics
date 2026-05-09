@@ -3,7 +3,6 @@
 
 
 bt_speeches_dat <- read.csv("data/bundestag_20wp_speeches.csv")
-
 bt_speeches <- bt_speeches_dat[bt_speeches_dat$speech_text != "", ]
 
 
